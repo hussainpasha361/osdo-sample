@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { gsap, useGSAP, motionOK } from "@/lib/gsap";
-import { Link } from "@/components/layout/PageTransition";
 import { RevealText } from "@/components/motion/Reveal";
 import { approach } from "@/content/approach";
 
@@ -401,12 +400,6 @@ export default function PlanToSpace({ headingLevel = "h2" }: { headingLevel?: "h
             <div className="pts-progress" aria-hidden="true">
               <span ref={bar} />
             </div>
-            <p className="t-note text-graphite">
-              Illustrative sequence, after the{" "}
-              <Link href={`/work/${approach.project.slug}`} className="u-line u-line--on text-charcoal" data-cursor="View project">
-                {approach.project.title}
-              </Link>
-            </p>
           </div>
 
           <div ref={sheet} className="pts-sheet col-span-6 md:col-start-5 md:col-span-8">

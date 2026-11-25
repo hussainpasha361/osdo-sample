@@ -2569,9 +2569,6 @@ html.motion .cta-slat {
   stroke-width: 2;
   pointer-events: none;
 }
-.fw-hint {
-  color: rgb(234 230 219 / 0.6);
-}
 .footer-base {
   border-top: 1px solid var(--line-ivory);
   padding-top: 18px;

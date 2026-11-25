@@ -75,7 +75,7 @@ export type Project = {
   summary?: string;
   /** Status line where completion is not confirmed, e.g. "Completion to be confirmed". */
   status?: string;
-  /** How the imagery was made, e.g. "AI-enhanced imagery". Shown wherever the project appears. */
+  /** How the imagery was made, e.g. "Rendered visualisations". Shown wherever the project appears. */
   mediaNote?: string;
   /** Set when the title is a working title. */
   titleNote?: string;

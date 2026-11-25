@@ -11,7 +11,6 @@ export default function Footer() {
     <footer className="footer" data-nav-tone="ivory" data-section="OSDO">
       <div className="wrap">
         <ConstructedWordmark />
-        <p className="fw-hint t-note mt-3 text-right">Move across the letters, or tap one to redraw it</p>
       </div>
 
       <div className="grid-12 mt-[clamp(48px,6vw,96px)] gap-y-10">

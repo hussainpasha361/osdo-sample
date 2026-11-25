@@ -95,7 +95,6 @@ const list: Project[] = [
     group: "completed",
     title: "KAALIYAS. Steakhouse",
     category: "Hospitality",
-    mediaNote: "AI-enhanced imagery",
     featured: true,
     cover: kaaliyas.kitchen,
     media: [kaaliyas.kitchen, kaaliyas.facade, kaaliyas.entrance, kaaliyas.dining, kaaliyas.nook],
