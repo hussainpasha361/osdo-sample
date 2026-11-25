@@ -175,6 +175,8 @@ export default function Hero() {
               const p = s.progress;
               word.classList.toggle("is-morphing", p > 0.004);
               el.classList.toggle("is-grid", p > 0.22);
+              // Phones keep every pane as a drawing; the toggle shows the photographs.
+              if (phone) return;
               lead.current?.setScroll(gsap.utils.clamp(0, 1, p / 0.26));
               panes.current.forEach((h, i) => h?.setScroll(gsap.utils.clamp(0, 1, (p - (0.5 + i * 0.05)) / 0.12)));
             },
@@ -229,10 +231,14 @@ export default function Hero() {
           },
         });
 
+        // Re-place the panes whenever ScrollTrigger re-measures, so they always
+        // share the exact sizes the lead frame tweens to.
         window.addEventListener("resize", placePanes);
+        ScrollTrigger.addEventListener("refresh", placePanes);
         return () => {
           st.kill();
           window.removeEventListener("resize", placePanes);
+          ScrollTrigger.removeEventListener("refresh", placePanes);
           lead.current?.setScroll(0);
         };
       });
