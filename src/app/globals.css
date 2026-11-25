@@ -1065,7 +1065,7 @@ html.has-cursor .cursor {
   position: absolute;
   left: var(--margin);
   bottom: clamp(18px, 4vh, 44px);
-  width: min(52vw, 900px);
+  width: min(55vw, 1000px);
   z-index: 3;
 }
 .hero-frame {
@@ -1503,8 +1503,10 @@ html.has-cursor .cursor {
   height: 66%;
 }
 /* companion images in arches, with an orange hairline arch set off them */
-.ex-frame--arch {
+.ex-frame--arch,
+.ex-frame--grid {
   position: relative;
+  isolation: isolate;
 }
 .ex-arch-line {
   position: absolute;
@@ -1763,9 +1765,9 @@ html.has-cursor .cursor {
 }
 .inside-ring {
   position: absolute;
-  left: calc(var(--margin) + 16vw);
-  top: clamp(40px, 6vw, 96px);
-  width: clamp(160px, 18vw, 300px);
+  right: calc(var(--margin) * -1 - 2vw);
+  bottom: clamp(40px, 6vw, 96px);
+  width: clamp(160px, 16vw, 260px);
   fill: none;
   stroke: var(--color-orange);
   stroke-width: 14;
@@ -1774,6 +1776,11 @@ html.has-cursor .cursor {
 }
 .inside-ring path {
   stroke-width: 2;
+}
+@media (max-width: 899px) {
+  .inside-ring {
+    display: none;
+  }
 }
 .inside-film {
   isolation: isolate;
@@ -1809,10 +1816,10 @@ html.has-cursor .cursor {
   background: repeating-linear-gradient(90deg, rgb(195 109 56 / 0.9) 0 1.5px, transparent 1.5px 9px);
 }
 .inside-grid {
-  left: -10%;
+  left: -12%;
   top: -8%;
-  right: 12%;
-  bottom: 20%;
+  right: 14%;
+  bottom: 12%;
   border-color: rgb(234 230 219 / 0.4);
   background-image: linear-gradient(90deg, rgb(234 230 219 / 0.4) 1.5px, transparent 1.5px), linear-gradient(rgb(234 230 219 / 0.4) 1.5px, transparent 1.5px);
 }
@@ -1830,16 +1837,6 @@ html.has-cursor .cursor {
   position: relative;
   z-index: 1;
 }
-.btn-line--onolive::before {
-  background: var(--color-orange);
-}
-@media (hover: hover) {
-  .btn-line--onolive:hover {
-    color: var(--color-charcoal);
-    border-color: var(--color-orange);
-  }
-}
-
 /* =====================================================================
    Approach
    ===================================================================== */
@@ -2307,42 +2304,81 @@ html.motion .cta-slat {
   stroke: rgb(234 230 219 / 0.55);
   pointer-events: none;
 }
+/* Buttons: a label and an arch cell. Hover fills the cell, lifts the arch
+   and warms the border; nothing turns solid black. */
 .btn-line {
+  --btn-line: color-mix(in srgb, currentColor 42%, transparent);
+  --btn-fill: var(--color-orange);
+  --btn-icon-on: var(--color-charcoal);
+  --btn-hover-border: var(--color-orange);
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 22px;
-  border: 1px solid currentColor;
+  min-height: 50px;
+  padding: 0 70px 0 20px;
+  border: 1px solid var(--btn-line);
+  background: linear-gradient(var(--btn-line), var(--btn-line)) right 50px top 0 / 1px 100% no-repeat;
   font-size: 15px;
   line-height: 1;
-  position: relative;
   isolation: isolate;
   overflow: hidden;
-  transition: color 0.4s var(--ease-out-quart);
+  transition: border-color 0.45s var(--ease-out-quart), color 0.3s;
+}
+.btn-line > * {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.6s var(--ease-out-expo);
 }
 .btn-line::before {
   content: "";
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: currentColor;
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.5s var(--ease-out-expo);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50px;
+  background: var(--btn-fill);
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 0.55s var(--ease-out-expo);
 }
-.btn-line > * {
-  position: relative;
+.btn-line::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 18px;
+  height: 22px;
+  margin-top: -11px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M3.5 22V10.5a6.5 6.5 0 0 1 13 0V22' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M0 23h20' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M3.5 22V10.5a6.5 6.5 0 0 1 13 0V22' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M0 23h20' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform 0.6s var(--ease-out-expo), background-color 0.3s;
 }
 @media (hover: hover) {
+  .btn-line:hover {
+    border-color: var(--btn-hover-border);
+  }
   .btn-line:hover::before {
-    transform: scaleY(1);
+    clip-path: inset(0 0 0 0);
   }
-  .btn-line--charcoal:hover {
-    color: var(--color-orange);
+  .btn-line:hover::after {
+    background-color: var(--btn-icon-on);
+    transform: translateY(-3px);
   }
-  .btn-line--charcoal:hover > * {
-    color: var(--color-orange);
+  .btn-line:hover > *:first-child {
+    transform: translateX(4px);
   }
+}
+.btn-line:active {
+  transform: scale(0.985);
+}
+.btn-line--charcoal {
+  --btn-fill: var(--color-charcoal);
+  --btn-icon-on: var(--color-orange);
+  --btn-hover-border: var(--color-charcoal);
+}
+.btn-line--onolive {
+  --btn-hover-border: var(--color-orange);
 }
 
 .footer {

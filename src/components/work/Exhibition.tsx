@@ -41,10 +41,11 @@ function Marks({ num }: { num: string }) {
 
 const tagOf = (m: M) => (m.role === "before" ? "Before" : m.role === "after" ? "After" : undefined);
 
-function Frame({ m, ratio, sizes, num, drift = 3, arch = false }: { m: M; ratio?: string; sizes: string; num?: string; drift?: number; arch?: boolean }) {
+function Frame({ m, ratio, sizes, num, drift = 3, arch = false, grid }: { m: M; ratio?: string; sizes: string; num?: string; drift?: number; arch?: boolean; grid?: "br" | "tl" | "tr" }) {
   const tag = tagOf(m);
   return (
-    <div className={`ex-frame ${arch ? "ex-frame--arch" : ""}`}>
+    <div className={`ex-frame ${arch ? "ex-frame--arch" : ""} ${grid ? "ex-frame--grid" : ""}`}>
+      {grid ? <GridBox className={`ex-grid--${grid}`} /> : null}
       {arch ? <span className="ex-arch-line" aria-hidden="true" /> : null}
       <ClipReveal drift={drift} className={arch ? "arch" : ""}>
         <Media media={m} ratio={ratio} sizes={sizes} />
@@ -125,8 +126,7 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
           return (
             <li key={p.slug} className="ex-item ex-flagship grid-12 gap-y-8">
               <Link href={href} className="ex-link col-span-6 md:col-span-7 relative" data-cursor="View project" aria-label={label}>
-                <GridBox className="ex-grid--br" />
-                <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 56vw, 100vw" num={p.number} />
+                <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 56vw, 100vw" num={p.number} grid="br" />
               </Link>
               <div className="col-span-6 md:col-start-9 md:col-span-4 flex flex-col gap-10">
                 <div>
@@ -157,8 +157,7 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
               </div>
               <Link href={href} className="ex-link col-span-6 order-1 md:order-2 md:col-start-5 md:col-span-8 relative" data-cursor="View project" aria-label={label}>
                 <Fluted className="ex-flute--left" />
-                <GridBox className="ex-grid--tr" />
-                <Frame m={p.cover} sizes="(min-width: 768px) 66vw, 100vw" num={p.number} />
+                <Frame m={p.cover} sizes="(min-width: 768px) 66vw, 100vw" num={p.number} grid="tr" />
               </Link>
             </li>
           );
@@ -169,8 +168,7 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
           return (
             <li key={p.slug} className="ex-item grid-12 gap-y-6">
               <Link href={href} className="ex-link col-span-6 md:col-start-2 md:col-span-5 relative" data-cursor="View project" aria-label={label}>
-                <GridBox className="ex-grid--tl" />
-                <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 40vw, 100vw" num={p.number} />
+                <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 40vw, 100vw" num={p.number} grid="tl" />
                 <Caption p={p} />
               </Link>
               <div className="col-span-4 col-start-3 md:col-start-8 md:col-span-4 md:mt-[30%]" aria-hidden="true">
@@ -185,8 +183,7 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
               <Frame m={second} ratio="4 / 5" sizes="(min-width: 768px) 25vw, 50vw" drift={5} arch />
             </div>
             <Link href={href} className="ex-link col-span-3 md:col-start-5 md:col-span-5 relative" data-cursor="View project" aria-label={label}>
-              <GridBox className="ex-grid--br" />
-              <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 40vw, 50vw" num={p.number} />
+              <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 40vw, 50vw" num={p.number} grid="br" />
               <Caption p={p} />
             </Link>
           </li>

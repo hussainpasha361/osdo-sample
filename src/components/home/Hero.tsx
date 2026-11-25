@@ -38,7 +38,7 @@ export default function Hero() {
     const navH = vw < 900 ? 64 : 72;
     const margin = Math.min(Math.max(20, vw * 0.034), 56);
     const height = vh - navH - 116;
-    const width = Math.min((height * d.width) / d.height, vw * 0.44);
+    const width = Math.min((height * d.width) / d.height, vw * 0.38);
     return { left: vw - margin - width, top: navH + 60, width, height };
   }, [d.width, d.height]);
 
@@ -164,7 +164,7 @@ export default function Hero() {
           .fromTo(".nav-mark", { scale: 1 }, { scale: 1.3, duration: 0.02, ease: "power2.out", yoyo: true, repeat: 1 }, 0.29)
           .to(f, { outlineColor: "rgba(195,109,56,0)", outlineOffset: 0, duration: 0.16 }, 0.18)
           .to(el.querySelector(".hero-ident"), { opacity: 0, y: -24, duration: 0.14 }, 0.2)
-          .to(el.querySelector(".hero-tools"), { opacity: 0, duration: 0.18 }, 0.2)
+          .to(el.querySelector(".hero-tools"), { opacity: 0, duration: 0.05 }, 0)
           .to(f, { left: () => paneRect(3).left, top: () => paneRect(3).top, width: () => paneRect(3).width, height: () => paneRect(3).height, ease: "power2.inOut", duration: 0.22 }, 0.24)
           .fromTo(el.querySelector(".hero-steel"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.3)
           .fromTo(paneEls, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.14, stagger: 0.04, ease: "power3.out" }, 0.33)
@@ -241,16 +241,8 @@ export default function Hero() {
           </g>
         );
       }
-      const y = oy + g.at * s;
-      if (y < f.top || y > f.top + f.height) return null;
-      return (
-        <g key={g.label} data-g>
-          <line x1={f.left - 150} x2={f.left - 8} y1={y} y2={y} strokeDasharray="2 5" />
-          <text x={f.left - 150} y={y - 8}>
-            {g.label}
-          </text>
-        </g>
-      );
+      // Horizontal datums are left out here: they would cross the drafting tools.
+      return null;
     });
   }
 

@@ -70,9 +70,9 @@ export default function InsideOsdo({ standalone = false }: { standalone?: boolea
           <figcaption className="inside-cap t-note">Studio film, provisional cut</figcaption>
         </figure>
 
-        <figure className="col-span-3 md:col-span-3 md:col-start-10 md:mt-[46%] relative isolate">
-          <span className="ex-grid inside-grid" aria-hidden="true" />
-          <Parallax speed={6}>
+        <figure className="col-span-3 md:col-span-3 md:col-start-10 md:mt-[46%]">
+          <Parallax speed={6} className="relative isolate">
+            <span className="ex-grid inside-grid" aria-hidden="true" />
             <ClipReveal drift={3}>
               <Media media={shelving} ratio="4 / 5" sizes="(min-width: 768px) 25vw, 50vw" />
             </ClipReveal>
