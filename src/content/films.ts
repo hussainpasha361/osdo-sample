@@ -1,7 +1,9 @@
 /**
  * FILMS
  *
- * Reels from OSDO's Instagram for the "On film" section. Each film is a
+ * Reels from OSDO's Instagram for the "On film" section. reel-2 and reel-3 are
+ * placeholder cuts from screen recordings (Instagram interface cropped out);
+ * replace them with the original exports when available. Each film is a
  * muted, looping MP4 (H.264, faststart) with a poster frame. Screen
  * recordings must be cropped to remove the Instagram interface before use;
  * originals go in /assets/originals/films. Order here is display order.
@@ -31,10 +33,22 @@ export const films: Film[] = [
   },
   {
     id: "reel-2",
-    title: "Film to come",
-    width: 1080,
-    height: 1920,
-    alt: "Placeholder for an OSDO reel",
+    title: "Guess the building",
+    src: "/media/films/reel-02.mp4",
+    poster: "/media/films/reel-02-poster.jpg",
+    width: 340,
+    height: 560,
+    alt: "Two members of the studio play a guessing game about famous buildings across the meeting table.",
+    status: "placeholder",
+  },
+  {
+    id: "reel-3",
+    title: "At the drawing table",
+    src: "/media/films/reel-03.mp4",
+    poster: "/media/films/reel-03-poster.jpg",
+    width: 340,
+    height: 560,
+    alt: "The team sketches and annotates a design together around the studio table.",
     status: "placeholder",
   },
 ];

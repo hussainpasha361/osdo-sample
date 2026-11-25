@@ -130,7 +130,7 @@ export default function Films() {
                 type="button"
                 className="film-card"
                 onClick={() => choose(i)}
-                onMouseEnter={() => f.src && setActive(i)}
+                onPointerEnter={(e) => e.pointerType === "mouse" && f.src && setActive(i)}
                 aria-pressed={i === active}
                 aria-label={f.src ? `${f.title}${i === active ? (muted ? ", select to turn sound on" : ", select to turn sound off") : ", play"}` : `${f.title}, not yet available`}
                 data-cursor={f.src ? (i === active ? (muted ? "Sound on" : "Sound off") : "Play film") : undefined}
