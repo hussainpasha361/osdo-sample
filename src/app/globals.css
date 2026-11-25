@@ -868,7 +868,7 @@ html.has-cursor .cursor {
    ===================================================================== */
 .hero {
   position: relative;
-  height: 260vh;
+  height: 330vh;
 }
 .hero-stick {
   position: sticky;
@@ -1023,13 +1023,6 @@ html.has-cursor .cursor {
 .hero-tools .ht-square path:first-child {
   fill: rgb(195 109 56 / 0.06);
 }
-.hero-steel {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: var(--color-charcoal);
-  opacity: 0;
-}
 .hero-guides-wrap {
   position: absolute;
   inset: 0;
@@ -1041,25 +1034,25 @@ html.has-cursor .cursor {
   overflow: hidden;
   margin: 0;
   clip-path: inset(100% 0 0 0);
+  box-shadow: 0 1px 0 var(--line);
 }
-.hero-pane-cap {
+.hero-panes-cap {
   position: absolute;
-  left: 14px;
-  bottom: 12px;
-  color: var(--color-ivory);
-  text-shadow: 0 1px 8px rgb(0 0 0 / 0.45);
+  left: var(--margin);
+  bottom: 16px;
+  z-index: 3;
+  color: var(--color-graphite);
+  opacity: 0;
 }
-.hero-transom {
+.hero-toggle-wrap {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  top: 34%;
-  height: 12px;
+  right: var(--margin);
+  bottom: 9px;
   z-index: 4;
-  background: var(--color-charcoal);
-  transform-origin: left;
-  transform: scaleX(0);
-  pointer-events: none;
+}
+.hero-toggle-wrap .hero-toggle {
+  position: static;
+  border: 1px solid var(--line);
 }
 .hero-word {
   position: absolute;
@@ -1077,8 +1070,14 @@ html.has-cursor .cursor {
   z-index: 2;
   will-change: left, top, width, height;
 }
-.hero-frame img,
-.hero-frame .hero-ink {
+.dp {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-ivory-2);
+}
+.dp img,
+.dp .hero-ink {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1100,7 +1099,13 @@ html.has-cursor .cursor {
   stroke: var(--color-ivory);
   clip-path: circle(var(--lens-r, 0px) at var(--lens-x, 50%) var(--lens-y, 50%));
 }
-.hero-frame.has-lens {
+.dp.is-open .hero-note text {
+  fill: var(--color-ivory);
+  paint-order: stroke;
+  stroke: rgb(0 0 0 / 0.35);
+  stroke-width: 4px;
+}
+.dp.has-lens {
   cursor: none;
 }
 .hero-lens-ring {
@@ -1113,19 +1118,18 @@ html.has-cursor .cursor {
   opacity: 0;
   transition: opacity 0.3s;
 }
-.hero-frame.has-lens .hero-lens-ring {
+.dp.has-lens .hero-lens-ring {
   opacity: 1;
 }
-.hero-frame.is-photo .hero-ink--photo {
+.dp.is-photo .hero-ink--photo {
   opacity: 0.22;
   transition: opacity 0.6s;
 }
-.hero-frame.is-photo .hero-lens-ring,
-.hero-frame.is-photo .hero-lens-read,
-.hero-frame.is-photo .hero-note {
+.dp.is-photo .hero-lens-ring,
+.dp.is-photo .hero-lens-read {
   display: none;
 }
-.hero-frame.is-photo.has-lens {
+.dp.is-photo.has-lens {
   cursor: auto;
 }
 .hero-lens-read {
@@ -1250,10 +1254,14 @@ html.has-cursor .cursor {
   }
   .hero-cue,
   .hero-pane,
-  .hero-steel,
-  .hero-transom,
+  .hero-panes-cap,
   .hero-guides-wrap {
     display: none;
+  }
+  .hero-toggle-wrap {
+    position: relative;
+    right: auto;
+    bottom: auto;
   }
   .hero-sheet {
     display: none;

@@ -1,17 +1,29 @@
-import type { Drawing, Media } from "./types";
+import type { Drawing, ImageMedia } from "./types";
 import { officeArchDrawing } from "./drawings/office-arch";
+import { officeShelvingDrawing } from "./drawings/office-shelving";
+import { officeDoorDrawing } from "./drawings/office-door";
+import { officeDeskDrawing } from "./drawings/office-desk";
 import { studioPhotos } from "./studio";
 
 /**
  * HERO
  *
- * A photograph and a line drawing registered to it. Replace both together:
- * `photo` with the chosen project image, `drawing` with linework traced in
- * that image's pixel space. Until OSDO selects a hero project, the studio's
- * own arched pantry stands in (genuine OSDO material, provisional quality).
+ * Photographs paired with line drawings traced in each image's own pixel
+ * space. `photo` + `drawing` lead the hero; `panes` join it as the frame
+ * opens into four. Replace a photo and its drawing together. Genuine OSDO
+ * studio material (provisional quality) until project images are chosen.
  */
-export const hero: { photo: Media; drawing: Drawing; caption: string } = {
-  photo: studioPhotos[0],
+export type DrawnPhoto = { photo: ImageMedia; drawing: Drawing };
+
+const img = (i: number) => studioPhotos[i] as ImageMedia;
+
+export const hero: DrawnPhoto & { caption: string; panes: DrawnPhoto[] } = {
+  photo: img(0),
   drawing: officeArchDrawing,
   caption: "The OSDO studio",
+  panes: [
+    { photo: img(1), drawing: officeShelvingDrawing },
+    { photo: img(2), drawing: officeDoorDrawing },
+    { photo: img(3), drawing: officeDeskDrawing },
+  ],
 };
