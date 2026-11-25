@@ -24,7 +24,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="pt-[calc(var(--nav-h)+clamp(48px,9vw,140px))] pb-[var(--section)] relative overflow-clip">
+    <div className="pt-[calc(var(--nav-h)+clamp(48px,9vw,140px))] pb-[var(--section)] relative overflow-clip" data-section="Contact">
       <Mark className="pointer-events-none absolute -right-[6vw] top-[8vh] h-[86vh] w-auto text-ivory-2" />
       <div className="grid-12 relative gap-y-16">
         <RevealText as="h1" className="t-xxl col-span-6 md:col-span-10 text-olive" text={["Tell us about", "your project"]} start="top 100%" />

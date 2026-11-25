@@ -19,7 +19,7 @@ import type { Drawing } from "@/content/types";
 function Ink({ d, className, idPrefix }: { d: Drawing; className: string; idPrefix: string }) {
   return (
     <svg className={`hero-ink draw ${className}`} viewBox={`0 0 ${d.width} ${d.height}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <g data-layer="hidden" strokeWidth={1.6} strokeDasharray="8 8" opacity={0.55}>
+      <g data-layer="hidden" strokeWidth={1.8} strokeDasharray="8 8" className="hero-hidden">
         {d.hidden?.map((p, i) => <path key={`${idPrefix}h${i}`} d={p} />)}
       </g>
       <g data-layer="lines" strokeWidth={2.2}>
@@ -156,10 +156,11 @@ export default function Hero() {
         tl.to(f, { left: 0, top: 0, width: () => document.documentElement.clientWidth, height: () => window.innerHeight, ease: "power2.inOut", duration: 0.6, onUpdate: paint }, 0.35)
           .to(el.querySelectorAll(".hero-guides, .hero-toggle, .hero-cue"), { opacity: 0, duration: 0.15 }, 0)
           .to(el.querySelectorAll(".hero-note"), { opacity: 0, duration: 0.15 }, 0)
+          .to(f, { outlineColor: "rgba(195,109,56,0)", outlineOffset: 0, duration: 0.25 }, 0.3)
+          .to(el.querySelector(".hero-ident"), { yPercent: -30, opacity: 0, duration: 0.3 }, 0.35)
           .to(el.querySelector(".hero-ink--paper"), { opacity: 0, duration: 0.3 }, 0.3)
           .to(el.querySelector(".hero-ink--photo"), { opacity: 0.18, duration: 0.4 }, 0.3)
           .to(el.querySelector(".hero-word"), { color: "#eae6db", duration: 0.25 }, 0.6)
-          .to(el.querySelector(".hero-ident"), { color: "#eae6db", duration: 0.25 }, 0.6)
           .to({}, { duration: 0.05 });
         // Ivory navigation while the photograph fills the screen.
         const nav = document.querySelector<HTMLElement>(".nav");
@@ -331,7 +332,7 @@ export default function Hero() {
   const s0 = { width: d.width, height: d.height };
 
   return (
-    <section ref={root} className="hero" aria-labelledby="hero-title" data-nav-tone-start>
+    <section ref={root} className="hero" aria-labelledby="hero-title" data-section="Home">
       <div className="hero-stick">
         <div className="hero-sheet" aria-hidden="true">
           <i />
@@ -347,6 +348,7 @@ export default function Hero() {
         ) : null}
 
         <div className="hero-ident" data-hero-fade>
+          <span className="hero-ident-mark" aria-hidden="true" />
           <h1 id="hero-title" className="t-m">
             {site.nameLines.map((l) => (
               <span key={l} className="block">
@@ -354,7 +356,7 @@ export default function Hero() {
               </span>
             ))}
           </h1>
-          <p className="t-small mt-2 text-graphite">{site.descriptor}</p>
+          <p className="t-small mt-2 hero-ident-sub">{site.descriptor}</p>
           <p className="hero-cue t-small" aria-hidden="true">
             <span />
             Scroll to open the drawing

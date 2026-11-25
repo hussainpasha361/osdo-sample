@@ -5,6 +5,7 @@ import { Link } from "@/components/layout/PageTransition";
 import { RevealText } from "@/components/motion/Reveal";
 import { ScrollTrigger } from "@/lib/gsap";
 import Exhibition from "./Exhibition";
+import Threshold from "@/components/motion/Threshold";
 import ProjectIndex from "./ProjectIndex";
 import type { Project } from "@/content/types";
 
@@ -22,6 +23,7 @@ export default function CompletedProjects({
   note,
   flagshipSlug,
   allLabel = "All projects",
+  mark = "A",
 }: {
   projects: Project[];
   total?: number;
@@ -33,6 +35,8 @@ export default function CompletedProjects({
   note?: string;
   flagshipSlug?: string;
   allLabel?: string;
+  /** Grid-bubble letter shown on the section threshold. */
+  mark?: string;
 }) {
   const [mode, setMode] = useState<"gallery" | "index">("gallery");
   const [filter, setFilter] = useState<string>("All");
@@ -46,7 +50,8 @@ export default function CompletedProjects({
   }, [mode, filter]);
 
   return (
-    <section className="cp" id={id} aria-labelledby={`${id}-title`}>
+    <section className="cp" id={id} aria-labelledby={`${id}-title`} data-section={title}>
+      <Threshold mark={mark} label={`${count} ${title.toLowerCase()}`} />
       <div className="cp-head grid-12">
         <div className="cp-title">
           <RevealText as={headingLevel} id={`${id}-title`} className="t-xxl" text={title} />

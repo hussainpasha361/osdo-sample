@@ -66,7 +66,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   );
 
   return (
-    <article>
+    <article data-section={project.title}>
       {landscape ? (
         <header className="pj-hero">
           <div className="grid-12 items-end gap-y-8 pb-[clamp(32px,5vw,72px)]">

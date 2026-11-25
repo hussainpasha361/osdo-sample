@@ -7,12 +7,20 @@ import { gsap, useGSAP, motionOK } from "@/lib/gsap";
 import { site } from "@/content/site";
 
 /** Orange band: one invitation, drawn over the outline of the OSDO arch. */
-export default function ContactBand() {
+export default function ContactBand({ from = "ivory" }: { from?: "ivory" | "olive" }) {
   const ref = useRef<HTMLElement>(null);
   useGSAP(
     () => {
       const svg = ref.current?.querySelector(".cta-arch");
       if (!svg) return;
+      if (motionOK()) {
+        // Fluted slats lift away, left to right, as the band is entered.
+        gsap.fromTo(
+          ref.current!.querySelectorAll(".cta-slat"),
+          { scaleY: 1 },
+          { scaleY: 0, ease: "power2.inOut", stagger: 0.06, scrollTrigger: { trigger: ref.current, start: "top bottom", end: "top 20%", scrub: 0.6 } }
+        );
+      }
       if (!motionOK()) {
         svg.classList.remove("draw--pending");
         return;
@@ -30,7 +38,12 @@ export default function ContactBand() {
   );
 
   return (
-    <section ref={ref} className="cta" aria-labelledby="cta-title">
+    <section ref={ref} className="cta" aria-labelledby="cta-title" data-section="Start a project">
+      <div className={`cta-slats cta-slats--${from}`} aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => (
+          <span key={i} className="cta-slat" />
+        ))}
+      </div>
       <svg className="cta-arch draw draw--pending" viewBox="-2 -2 182 246" aria-hidden="true">
         <circle cx="89" cy="72" r="72" pathLength={1} data-stroke />
         <circle cx="89" cy="72" r="46" pathLength={1} data-stroke />

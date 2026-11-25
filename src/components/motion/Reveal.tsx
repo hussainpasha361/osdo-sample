@@ -69,8 +69,11 @@ export function RevealText({
   );
 }
 
-/** Media opens upward from its base, with the image settling from a slight zoom. */
-export function ClipReveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+/**
+ * Media opens from a soft aperture while fading in, the image settling from a
+ * slight zoom. With `drift`, the image then glides inside its frame as you scroll.
+ */
+export function ClipReveal({ children, className = "", delay = 0, drift = 0 }: { children: React.ReactNode; className?: string; delay?: number; drift?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   useGSAP(
     () => {
@@ -80,22 +83,30 @@ export function ClipReveal({ children, className = "", delay = 0 }: { children: 
         el.classList.remove("clip--pending");
         return;
       }
-      const inner = el.querySelector(".media > img, .media > video, .media > .plate");
+      const inner = el.querySelector<HTMLElement>(".media > img, .media > video, .media > .plate");
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        scrollTrigger: { trigger: el, start: "top 92%", once: true },
         delay,
-        onComplete: () => {
-          el.classList.remove("clip--pending");
-          gsap.set(el, { clearProps: "clipPath" });
-        },
+        onComplete: () => el.classList.remove("clip--pending"),
       });
-      tl.fromTo(el, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "expo.inOut" });
-      if (inner) tl.fromTo(inner, { scale: 1.14 }, { scale: 1, duration: 1.8, ease: "expo.out", clearProps: "transform" }, 0.1);
+      tl.fromTo(
+        el,
+        { clipPath: "inset(12% 9% 12% 9%)" },
+        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "power3.out" }
+      ).fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.7, ease: "power1.out" }, 0);
+      if (inner) tl.fromTo(inner, { scale: 1.18 }, { scale: 1, duration: 2.2, ease: "power2.out", ...(drift ? {} : { clearProps: "transform" }) }, 0);
+      if (drift && inner) {
+        gsap.fromTo(
+          el.querySelector(".media"),
+          { yPercent: -drift, scale: 1 + drift / 50 },
+          { yPercent: drift, scale: 1 + drift / 50, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 0.8 } }
+        );
+      }
     },
     { scope: ref }
   );
   return (
-    <div ref={ref} className={`clip--pending ${className}`}>
+    <div ref={ref} className={`clip clip--pending ${className}`}>
       {children}
     </div>
   );

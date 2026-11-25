@@ -14,6 +14,7 @@ export default function WorkPage() {
             projects={studies}
             id="studies"
             title="Concepts & Design Studies"
+            mark="B"
             note="Design visualisations and sample renders, kept apart from completed work."
           />
         </div>

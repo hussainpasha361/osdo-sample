@@ -20,7 +20,7 @@ Press **G** anywhere (outside form fields) to show the 12-column grid.
 
 | Route | What it is |
 |---|---|
-| `/` | Hero (drawing → photograph), Completed Projects, Inside OSDO, Approach, contact band |
+| `/` | Hero (drawing → photograph), Completed Projects, Inside OSDO, From plan to space (scroll animation), contact band |
 | `/work` | Completed Projects, then Concepts & Design Studies, each with gallery and index views |
 | `/work/[slug]` | Project template, statically generated for every project |
 | `/studio` | Inside OSDO, extended |
@@ -36,7 +36,7 @@ All content is in `src/content/`. Components only read from it.
 | `site.ts` | Name, contact details, Instagram, location, credit. Unconfirmed values are `null` and show as "To be confirmed". |
 | `projects.ts` | All projects. `group: "completed"` or `"study"` decides the section. |
 | `studio.ts` | Office film and photographs for Inside OSDO |
-| `approach.ts` | Approach sequence, told with the Residential Transformation plans and photographs |
+| `approach.ts` | Title and project link for the "From plan to space" animation (`components/home/PlanToSpace.tsx`, an illustrative scroll-driven drawing) |
 | `hero.ts` + `drawings/` | Hero photograph and the line drawing registered to it |
 | `types.ts` | The content model: `Media`, `Project`, `ProjectBlock`, `Drawing` |
 
