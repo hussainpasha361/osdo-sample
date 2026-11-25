@@ -31,10 +31,13 @@ export default function Hero() {
   const [desktop, setDesktop] = useState(false);
   const [guideRect, setGuideRect] = useState<{ vw: number; vh: number; f: Rect } | null>(null);
   const d = hero.drawing;
+  // The sticky stage is 100svh: unlike innerHeight it does not change as mobile
+  // browser toolbars show and hide, so every pane is measured against the same height.
+  const stageH = () => root.current?.querySelector<HTMLElement>(".hero-stick")?.clientHeight || window.innerHeight;
 
   const startRect = useCallback((): Rect => {
     const vw = document.documentElement.clientWidth;
-    const vh = window.innerHeight;
+    const vh = stageH();
     const navH = vw < 900 ? 64 : 72;
     const margin = Math.min(Math.max(20, vw * 0.034), 56);
     if (vw < 900) {
@@ -57,13 +60,14 @@ export default function Hero() {
   /** Final state: four panes (a row on desktop, a 2×2 grid on phones); the lead frame becomes the last. */
   const paneRect = useCallback((i: number): Rect => {
     const vw = document.documentElement.clientWidth;
-    const vh = window.innerHeight;
+    const vh = stageH();
     const margin = Math.min(Math.max(20, vw * 0.034), 56);
     if (vw < 900) {
-      const gap = 8;
-      const top = 64 + 12;
+      // Phone: an even 2x2 grid, leaving a clear strip at the foot for the toggle.
+      const gap = 10;
+      const top = 64 + 14;
       const w = (vw - margin * 2 - gap) / 2;
-      const h = (vh - top - 58 - gap) / 2;
+      const h = (vh - top - 64 - gap) / 2;
       return { left: margin + (i % 2) * (w + gap), top: top + Math.floor(i / 2) * (h + gap), width: w, height: h };
     }
     const gap = Math.min(Math.max(10, vw * 0.012), 20);
@@ -124,7 +128,7 @@ export default function Hero() {
       }
 
       const mm = gsap.matchMedia();
-      mm.add("(min-width: 0px)", () => {
+      mm.add({ phone: "(max-width: 899px)", desk: "(min-width: 900px)" }, (ctx) => {
         const f = frame.current!;
         const word = el.querySelector<HTMLElement>(".hero-word")!;
         const wsvg = word.querySelector("svg")!;
@@ -139,6 +143,17 @@ export default function Hero() {
           return { x: mark.left - word.offsetLeft - MORPH.bbox.x * k * sc, y: mark.top - word.offsetTop - MORPH.bbox.y * k * sc, s: sc };
         };
         const paneEls = gsap.utils.toArray<HTMLElement>(".hero-pane", el);
+        // Phones keep the sequence but skip the per-stroke drawing and the
+        // annotations on the three panes: they arrive as finished drawings.
+        const phone = !!ctx.conditions?.phone;
+        const touch = window.matchMedia("(pointer: coarse)").matches;
+        if (phone) {
+          paneEls.forEach((p) => {
+            const ink = p.querySelector(".hero-ink--paper");
+            ink?.classList.remove("draw--pending");
+            gsap.set(p.querySelectorAll(".hero-ink--paper [data-stroke]"), { strokeDashoffset: 0 });
+          });
+        }
         const placePanes = () =>
           gsap.set(paneEls, {
             left: (i: number) => paneRect(i).left,
@@ -153,11 +168,13 @@ export default function Hero() {
             trigger: el,
             start: "top top",
             end: "bottom bottom",
-            scrub: ok ? 0.6 : true,
+            // Touch scrolling already has momentum: a short catch-up keeps it responsive.
+            scrub: ok ? (touch ? 0.15 : 0.6) : true,
             invalidateOnRefresh: true,
             onUpdate: (s) => {
               const p = s.progress;
               word.classList.toggle("is-morphing", p > 0.004);
+              el.classList.toggle("is-grid", p > 0.22);
               lead.current?.setScroll(gsap.utils.clamp(0, 1, p / 0.26));
               panes.current.forEach((h, i) => h?.setScroll(gsap.utils.clamp(0, 1, (p - (0.5 + i * 0.05)) / 0.12)));
             },
@@ -185,16 +202,17 @@ export default function Hero() {
           .to(f, { left: () => paneRect(3).left, top: () => paneRect(3).top, width: () => paneRect(3).width, height: () => paneRect(3).height, ease: "power2.inOut", duration: 0.22 }, 0.24)
           .fromTo(el.querySelector(".hero-steel"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.3)
           .fromTo(paneEls, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.14, stagger: 0.04, ease: "power3.out" }, 0.33)
-          .fromTo(
+          .fromTo(el.querySelector(".hero-panes-cap"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.46)
+          .to(el.querySelector(".hero-toggle-wrap"), { bottom: 9, duration: 0.12, ease: "power2.inOut" }, 0.3)
+          .to({}, { duration: 0.05 }, 0.95);
+        if (!phone) {
+          tl.fromTo(
             paneEls.map((p) => p.querySelectorAll(".hero-ink--paper [data-stroke]")),
             { strokeDashoffset: 1 },
             { strokeDashoffset: 0, duration: 0.12, stagger: { amount: 0.06 }, ease: "power1.inOut" },
             0.35
-          )
-          .fromTo(paneEls.map((p) => p.querySelectorAll(".hero-note")), { opacity: 0 }, { opacity: 1, duration: 0.05, stagger: { amount: 0.05 } }, 0.44)
-          .fromTo(el.querySelector(".hero-panes-cap"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.46)
-          .to(el.querySelector(".hero-toggle-wrap"), { bottom: 9, duration: 0.12, ease: "power2.inOut" }, 0.3)
-          .to({}, { duration: 0.05 }, 0.95);
+          ).fromTo(paneEls.map((p) => p.querySelectorAll(".hero-note")), { opacity: 0 }, { opacity: 1, duration: 0.05, stagger: { amount: 0.05 } }, 0.44);
+        }
 
         (window as unknown as { __heroTl?: gsap.core.Timeline }).__heroTl = tl;
         // Ivory navigation over the black backdrop.

@@ -95,10 +95,13 @@ export default function HeroTools({ className = "" }: { className?: string }) {
       const scale = gsap.to(marker, { x: 360, duration: 9, ease: "sine.inOut", repeat: -1, yoyo: true });
 
       const all = [compass, ruling, scale];
+      // Run only while visible: the tools fade out early in the hero scroll.
+      const sec = (svg.closest("section") as HTMLElement | null) ?? svg;
       ScrollTrigger.create({
-        trigger: svg.closest("section") ?? svg,
+        trigger: sec,
         start: "top bottom",
-        end: "bottom top",
+        end: () => `top+=${Math.max(1, (sec.getBoundingClientRect().height - window.innerHeight) * 0.06)} top`,
+        invalidateOnRefresh: true,
         onToggle: (s) => all.forEach((t) => (s.isActive ? t.play() : t.pause())),
       });
     },

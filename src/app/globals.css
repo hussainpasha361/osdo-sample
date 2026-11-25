@@ -1351,9 +1351,16 @@ html.has-cursor .cursor {
   .hero-guides-wrap {
     display: none;
   }
-  .hero-panes-cap {
-    bottom: 20px;
-    max-width: 48%;
+  /* Phone grid: photographs and quiet linework only, no labels or caption. */
+  .hero-panes-cap,
+  .hero-pane .hero-note,
+  .hero.is-grid .hero-note,
+  .dp.is-open .hero-note {
+    display: none;
+  }
+  .hero-toggle-wrap .hero-toggle button {
+    padding: 10px 14px;
+    font-size: 12.5px;
   }
   .hero-sheet {
     inset: 8px;

@@ -48,44 +48,109 @@ const DrawingPhoto = forwardRef<
   const photoInk = useRef<SVGSVGElement>(null);
   const notes = useRef<SVGSVGElement>(null);
   const last = useRef<{ x: number; y: number } | null>(null);
-  const L = useRef({ x: 0.5, y: 0.45, hoverR: 0, scrollP: 0, toggled: false });
+  // mode: null follows scroll; "photo"/"drawing" is the visitor's choice from the toggle,
+  // which overrides scroll. forceK is that choice's reveal (0 drawing, 1 photo), tweened.
+  const L = useRef({ x: 0.5, y: 0.45, hoverR: 0, scrollP: 0, mode: null as null | "photo" | "drawing", forceK: 0 });
+  const forceTween = useRef<gsap.core.Tween | null>(null);
+  // Cached size (kept by a ResizeObserver) so scroll frames never read layout.
+  const size = useRef({ w: 0, h: 0 });
+  // Phones: the photograph fades in rather than opening through a lens; cheaper to draw.
+  const fade = useRef(false);
+  const els = useRef<{ photo: HTMLElement | null; paper: SVGSVGElement | null; scan: SVGSVGElement | null } | null>(null);
+  const was = useRef<{ open?: boolean; scan?: boolean; covered?: boolean }>({});
+
+  const getEls = () => {
+    const el = root.current;
+    if (!el) return null;
+    if (!els.current)
+      els.current = {
+        photo: el.querySelector<HTMLElement>(".hero-photo"),
+        paper: el.querySelector<SVGSVGElement>(".hero-ink--paper"),
+        scan: el.querySelector<SVGSVGElement>(".hero-ink--scan"),
+      };
+    return els.current;
+  };
+
+  // Keep annotations inside the visible crop: hide notes that fall outside it
+  // and set each label on whichever side has room. Runs on resize only.
+  const layoutNotes = useCallback(() => {
+    const { w, h } = size.current;
+    if (!notes.current || w <= 0) return;
+    const k = Math.max(w / d.width, h / d.height);
+    const x0 = (0 - (w - d.width * k) / 2) / k;
+    const x1 = (w - (w - d.width * k) / 2) / k;
+    notes.current.querySelectorAll<SVGGElement>("[data-nx]").forEach((g) => {
+      const nx = Number(g.dataset.nx);
+      const inside = nx > x0 + 24 && nx < x1 - 24;
+      g.style.display = inside ? "" : "none";
+      const left = nx > (x0 + x1) / 2;
+      const line = g.querySelector("line")!;
+      const text = g.querySelector("text")!;
+      line.setAttribute("x1", String(left ? -9 : 9));
+      line.setAttribute("x2", String(left ? -34 : 34));
+      text.setAttribute("x", String(left ? -40 : 40));
+      text.setAttribute("text-anchor", left ? "end" : "start");
+    });
+  }, [d.width, d.height]);
 
   const paint = useCallback(() => {
     const el = root.current;
-    if (!el) return;
-    const w = el.offsetWidth;
-    const h = el.offsetHeight;
+    const e = getEls();
+    if (!el || !e) return;
+    if (!size.current.w) size.current = { w: el.offsetWidth, h: el.offsetHeight };
+    const { w, h } = size.current;
     const s = L.current;
+    const prev = was.current;
     const maxR = Math.hypot(w, h);
-    const reveal = s.toggled ? 1 : Math.max(s.scrollP, Math.min(1, s.hoverR / maxR));
-    const r = s.toggled ? maxR : Math.max(s.hoverR, s.scrollP * maxR);
-    el.style.setProperty("--lens-x", `${s.x * w}px`);
-    el.style.setProperty("--lens-y", `${s.y * h}px`);
-    el.style.setProperty("--lens-r", `${r}px`);
-    el.style.setProperty("--scan-r", `${s.hoverR}px`);
+    const hoverK = maxR ? Math.min(1, s.hoverR / maxR) : 0;
+    const base = s.mode ? s.forceK : s.scrollP;
+    const reveal = Math.max(base, hoverK);
+    const open = base > 0.9;
     // Once the photograph is open, its linework settles back to a trace.
-    el.classList.toggle("is-open", s.toggled || s.scrollP > 0.9);
-    // Keep annotations inside the visible crop: hide notes that fall outside
-    // it and set each label on whichever side has room.
-    if (notes.current && w > 0) {
-      const k = Math.max(w / d.width, h / d.height);
-      const x0 = (0 - (w - d.width * k) / 2) / k;
-      const x1 = (w - (w - d.width * k) / 2) / k;
-      notes.current.querySelectorAll<SVGGElement>("[data-nx]").forEach((g) => {
-        const nx = Number(g.dataset.nx);
-        const inside = nx > x0 + 24 && nx < x1 - 24;
-        g.style.display = inside ? "" : "none";
-        const left = nx > (x0 + x1) / 2;
-        const line = g.querySelector("line")!;
-        const text = g.querySelector("text")!;
-        line.setAttribute("x1", String(left ? -9 : 9));
-        line.setAttribute("x2", String(left ? -34 : 34));
-        text.setAttribute("x", String(left ? -40 : 40));
-        text.setAttribute("text-anchor", left ? "end" : "start");
-      });
+    if (open !== prev.open) {
+      el.classList.toggle("is-open", open);
+      prev.open = open;
     }
-    if (photoInk.current) photoInk.current.style.opacity = String(1 - 0.72 * Math.max(s.scrollP, s.toggled ? 1 : 0, reveal > 0.95 ? 1 : 0));
-    if (ring.current) {
+    const trace = 1 - 0.72 * Math.max(base, reveal > 0.95 ? 1 : 0);
+    let covered: boolean;
+    if (fade.current) {
+      if (e.photo) {
+        e.photo.style.clipPath = "none";
+        e.photo.style.opacity = String(reveal);
+      }
+      if (photoInk.current) {
+        photoInk.current.style.clipPath = "none";
+        photoInk.current.style.opacity = String(reveal * trace);
+      }
+      covered = reveal >= 0.999;
+    } else {
+      const r = Math.max(s.hoverR, base * maxR);
+      const clip = `circle(${r.toFixed(1)}px at ${(s.x * w).toFixed(1)}px ${(s.y * h).toFixed(1)}px)`;
+      if (e.photo) {
+        e.photo.style.clipPath = clip;
+        e.photo.style.opacity = "";
+      }
+      if (photoInk.current) {
+        photoInk.current.style.clipPath = clip;
+        photoInk.current.style.opacity = String(trace);
+      }
+      covered = r >= maxR - 0.5;
+    }
+    // The paper drawing is fully hidden under an open photograph: stop painting it.
+    if (e.paper && covered !== prev.covered) {
+      e.paper.style.visibility = covered ? "hidden" : "";
+      prev.covered = covered;
+    }
+    // The scan layer (bright linework under the lens) only exists while a lens is out.
+    const scanning = open && s.hoverR > 0.5 && !fade.current;
+    if (e.scan) {
+      if (scanning) e.scan.style.clipPath = `circle(${s.hoverR.toFixed(1)}px at ${(s.x * w).toFixed(1)}px ${(s.y * h).toFixed(1)}px)`;
+      if (scanning !== prev.scan) {
+        e.scan.style.display = scanning ? "" : "none";
+        prev.scan = scanning;
+      }
+    }
+    if (ring.current && s.hoverR > 0) {
       const rr = Math.min(s.hoverR, 400);
       ring.current.style.width = ring.current.style.height = `${rr * 2}px`;
       ring.current.style.transform = `translate(${s.x * w - rr}px, ${s.y * h - rr}px)`;
@@ -104,27 +169,24 @@ const DrawingPhoto = forwardRef<
         const el = root.current;
         if (!el) return;
         el.classList.toggle("is-photo", on);
+        // Start from what is on screen now, so the change never jumps.
+        const from = s.mode ? s.forceK : s.scrollP;
+        s.mode = on ? "photo" : "drawing";
+        s.x = 0.5;
+        s.y = 0.5;
+        forceTween.current?.kill();
         if (!motionOK()) {
-          s.toggled = on;
+          s.forceK = on ? 1 : 0;
           paint();
           return;
         }
-        const maxR = Math.hypot(el.offsetWidth, el.offsetHeight);
-        const o = { v: on ? s.hoverR : maxR };
-        s.toggled = false;
-        s.x = 0.5;
-        s.y = 0.5;
-        gsap.to(o, {
-          v: on ? maxR : 0,
+        const o = { v: from };
+        forceTween.current = gsap.to(o, {
+          v: on ? 1 : 0,
           duration: 1.1,
           ease: "expo.inOut",
           onUpdate: () => {
-            s.hoverR = o.v;
-            paint();
-          },
-          onComplete: () => {
-            s.toggled = on;
-            s.hoverR = 0;
+            s.forceK = o.v;
             paint();
           },
         });
@@ -138,6 +200,20 @@ const DrawingPhoto = forwardRef<
   useEffect(() => {
     const el = root.current;
     if (!el) return;
+    const mq = window.matchMedia("(max-width: 899px)");
+    const setFade = () => {
+      fade.current = mq.matches;
+      paint();
+    };
+    mq.addEventListener("change", setFade);
+    const ro = new ResizeObserver(([entry]) => {
+      const b = entry.contentRect;
+      size.current = { w: b.width, h: b.height };
+      layoutNotes();
+      paint();
+    });
+    ro.observe(el);
+    fade.current = mq.matches;
     paint();
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const r = { v: 0 };
@@ -184,13 +260,11 @@ const DrawingPhoto = forwardRef<
       setR(0, 0.5);
     };
     const tap = (e: PointerEvent) => {
-      if (e.pointerType === "mouse") return;
+      if (e.pointerType === "mouse" || fade.current) return;
       pos(e);
       setR(Math.min(120, el.offsetWidth * 0.32));
       window.setTimeout(() => setR(0, 0.8), 1600);
     };
-    const onResize = () => paint();
-    window.addEventListener("resize", onResize);
     window.addEventListener("scroll", follow, { passive: true });
     gsap.ticker.add(follow);
     if (fine) {
@@ -200,7 +274,8 @@ const DrawingPhoto = forwardRef<
     } else el.addEventListener("pointerdown", tap);
     return () => {
       tween?.kill();
-      window.removeEventListener("resize", onResize);
+      ro.disconnect();
+      mq.removeEventListener("change", setFade);
       window.removeEventListener("scroll", follow);
       gsap.ticker.remove(follow);
       el.removeEventListener("pointerenter", enter);
@@ -208,7 +283,7 @@ const DrawingPhoto = forwardRef<
       el.removeEventListener("pointerleave", leave);
       el.removeEventListener("pointerdown", tap);
     };
-  }, [paint, d.width, d.height]);
+  }, [paint, layoutNotes, d.width, d.height]);
 
   return (
     <div ref={root} className={`dp ${className}`}>
