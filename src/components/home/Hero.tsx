@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP, motionOK } from "@/lib/gsap";
 import { hero } from "@/content/hero";
-import ConstructedWordmark from "@/components/brand/ConstructedWordmark";
+import ConstructedWordmark, { MORPH } from "@/components/brand/ConstructedWordmark";
 import HeroTools from "./HeroTools";
 import DrawingPhoto, { type DrawingPhotoHandle } from "./DrawingPhoto";
 import { site } from "@/content/site";
@@ -109,6 +109,18 @@ export default function Hero() {
       const mm = gsap.matchMedia();
       mm.add("(min-width: 900px)", () => {
         const f = frame.current!;
+        const word = el.querySelector<HTMLElement>(".hero-word")!;
+        const wsvg = word.querySelector("svg")!;
+        const letter = (i: number) => wsvg.querySelector(`.fw-morph[data-letter="${i}"]`)!;
+        const strokesOf = (...ids: number[]) => ids.flatMap((i) => Array.from(letter(i).querySelectorAll(".fw-stroke")));
+        // Where the finished mark docks: the logo mark in the navigation bar.
+        const dock = () => {
+          const mark = document.querySelector(".nav-mark")?.getBoundingClientRect();
+          const k = word.offsetWidth / 960;
+          if (!mark) return { x: 0, y: 0, s: 1 };
+          const sc = mark.height / (MORPH.bbox.h * k);
+          return { x: mark.left - word.offsetLeft - MORPH.bbox.x * k * sc, y: mark.top - word.offsetTop - MORPH.bbox.y * k * sc, s: sc };
+        };
         const paneEls = gsap.utils.toArray<HTMLElement>(".hero-pane", el);
         const placePanes = () =>
           gsap.set(paneEls, {
@@ -128,29 +140,62 @@ export default function Hero() {
             invalidateOnRefresh: true,
             onUpdate: (s) => {
               const p = s.progress;
-              lead.current?.setScroll(gsap.utils.clamp(0, 1, p / 0.32));
-              panes.current.forEach((h, i) => h?.setScroll(gsap.utils.clamp(0, 1, (p - (0.66 + i * 0.07)) / 0.16)));
+              word.classList.toggle("is-morphing", p > 0.004);
+              lead.current?.setScroll(gsap.utils.clamp(0, 1, p / 0.26));
+              panes.current.forEach((h, i) => h?.setScroll(gsap.utils.clamp(0, 1, (p - (0.5 + i * 0.05)) / 0.12)));
             },
           },
         });
-        tl.to(el.querySelectorAll(".hero-guides-wrap, .hero-cue"), { opacity: 0, duration: 0.12 }, 0)
-          .to(f, { outlineColor: "rgba(195,109,56,0)", outlineOffset: 0, duration: 0.2 }, 0.24)
-          .to(el.querySelectorAll(".hero-ident, .hero-word"), { opacity: 0, y: -24, duration: 0.2, stagger: 0.04 }, 0.28)
-          .to(el.querySelector(".hero-tools"), { opacity: 0, duration: 0.25 }, 0.3)
-          .to(f, { left: () => paneRect(3).left, top: () => paneRect(3).top, width: () => paneRect(3).width, height: () => paneRect(3).height, ease: "power2.inOut", duration: 0.3 }, 0.32)
-          .fromTo(paneEls, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.2, stagger: 0.05, ease: "power3.out" }, 0.46)
+        tl.to(el.querySelectorAll(".hero-guides-wrap, .hero-cue"), { opacity: 0, duration: 0.1 }, 0)
+          // OSDO becomes the mark: S and first O retract, D turns into the arch, O settles on top.
+          .to(strokesOf(0, 1), { strokeDashoffset: 1, duration: 0.08, ease: "power2.in" }, 0.02)
+          .to([letter(0), letter(1)], { opacity: 0, duration: 0.05 }, 0.06)
+          .to(wsvg.querySelectorAll(".fw-guide, .fw-node"), { opacity: 0, duration: 0.06 }, 0.02)
+          .to(letter(2), { rotation: -90, scaleX: MORPH.archScale, svgOrigin: `${MORPH.cx} ${MORPH.cy}`, duration: 0.1, ease: "power3.inOut" }, 0.05)
+          .to(letter(3), { x: MORPH.oDx, y: MORPH.oDy, scale: MORPH.ring, svgOrigin: `${MORPH.oCx} ${MORPH.cy}`, duration: 0.11, ease: "power3.inOut" }, 0.06)
+          .fromTo(wsvg.querySelector(".fw-lock"), { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.025, ease: "back.out(3)" }, 0.165)
+          // ...then docks into the navigation bar, taking the mark's colours.
+          .set(word, { zIndex: 120, transformOrigin: "0 0" }, 0.19)
+          .to(word, { x: () => dock().x, y: () => dock().y, scale: () => dock().s, duration: 0.11, ease: "power3.inOut" }, 0.19)
+          .to(strokesOf(2), { stroke: "#c36d38", duration: 0.06 }, 0.19)
+          .to(strokesOf(3), { stroke: "#252622", duration: 0.06 }, 0.19)
+          .to(wsvg.querySelector(".fw-lock"), { opacity: 0, duration: 0.03 }, 0.25)
+          .to(word, { opacity: 0, duration: 0.025 }, 0.295)
+          .fromTo(".nav-mark", { scale: 1 }, { scale: 1.3, duration: 0.02, ease: "power2.out", yoyo: true, repeat: 1 }, 0.29)
+          .to(f, { outlineColor: "rgba(195,109,56,0)", outlineOffset: 0, duration: 0.16 }, 0.18)
+          .to(el.querySelector(".hero-ident"), { opacity: 0, y: -24, duration: 0.14 }, 0.2)
+          .to(el.querySelector(".hero-tools"), { opacity: 0, duration: 0.18 }, 0.2)
+          .to(f, { left: () => paneRect(3).left, top: () => paneRect(3).top, width: () => paneRect(3).width, height: () => paneRect(3).height, ease: "power2.inOut", duration: 0.22 }, 0.24)
+          .fromTo(el.querySelector(".hero-steel"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.3)
+          .fromTo(paneEls, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.14, stagger: 0.04, ease: "power3.out" }, 0.33)
           .fromTo(
             paneEls.map((p) => p.querySelectorAll(".hero-ink--paper [data-stroke]")),
             { strokeDashoffset: 1 },
-            { strokeDashoffset: 0, duration: 0.22, stagger: 0.05, ease: "power1.inOut" },
-            0.5
+            { strokeDashoffset: 0, duration: 0.12, stagger: { amount: 0.06 }, ease: "power1.inOut" },
+            0.35
           )
-          .fromTo(paneEls.map((p) => p.querySelectorAll(".hero-note")), { opacity: 0 }, { opacity: 1, duration: 0.08, stagger: 0.04 }, 0.62)
-          .fromTo(el.querySelector(".hero-panes-cap"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.6)
-          .to({}, { duration: 0.08 }, 0.95);
+          .fromTo(paneEls.map((p) => p.querySelectorAll(".hero-note")), { opacity: 0 }, { opacity: 1, duration: 0.05, stagger: { amount: 0.05 } }, 0.44)
+          .fromTo(el.querySelector(".hero-panes-cap"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.46)
+          .to({}, { duration: 0.05 }, 0.95);
+
+        (window as unknown as { __heroTl?: gsap.core.Timeline }).__heroTl = tl;
+        // Ivory navigation over the black backdrop.
+        const nav = document.querySelector<HTMLElement>(".nav");
+        const st = ScrollTrigger.create({
+          trigger: el,
+          start: () => `top+=${(el.offsetHeight - window.innerHeight) * 0.33} top`,
+          end: "bottom top+=36",
+          invalidateOnRefresh: true,
+          onToggle: (s) => {
+            if (!nav) return;
+            if (s.isActive) nav.dataset.tone = "ivory";
+            else if (nav.dataset.tone === "ivory") delete nav.dataset.tone;
+          },
+        });
 
         window.addEventListener("resize", placePanes);
         return () => {
+          st.kill();
           window.removeEventListener("resize", placePanes);
           lead.current?.setScroll(0);
         };
@@ -245,6 +290,7 @@ export default function Hero() {
           Scroll to open the drawing
         </p>
 
+        <div className="hero-steel" aria-hidden="true" />
         {hero.panes.map((pane, i) => (
           <div key={pane.photo.src} className="hero-pane" style={{ position: "absolute" }}>
             <DrawingPhoto

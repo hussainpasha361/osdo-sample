@@ -54,6 +54,22 @@ const nodes: [number, number][] = [
   [D.x, BASE],
 ];
 
+/**
+ * Geometry for turning the wordmark into the mark (O resting on a D turned
+ * into an arch). Used by the hero's scroll morph.
+ */
+export const MORPH = (() => {
+  const left = D.x - SW / 2;
+  const right = D.x + 40 + R;
+  const cx = (left + right) / 2; // centre of the D's outer box
+  const dWidth = right - left; // D's horizontal extent (becomes the arch's height)
+  const archScale = 0.71; // flattens the bowl to the mark's proportions
+  const archTop = MID - (dWidth * archScale) / 2;
+  const ring = 0.81; // O to arch width, as in the mark
+  const oCy = archTop - R * ring;
+  return { cx, cy: MID, archScale, archTop, ring, oCx: O2.cx, oDx: cx - O2.cx, oDy: oCy - MID, bbox: { x: cx - R, y: oCy - R * ring, w: 2 * R, h: MID + (dWidth * archScale) / 2 - (oCy - R * ring) } };
+})();
+
 /** Letter index for each stroke, and each letter's centre (for proximity and the click pulse). */
 const LETTER_OF_STROKE = [0, 1, 2, 2, 3];
 const CENTRES: [number, number][] = [
@@ -134,6 +150,10 @@ export default function ConstructedWordmark({
     };
     const move = (e: PointerEvent) => {
       if (!drawn.current) return;
+      if (svg.closest(".is-morphing")) {
+        leave();
+        return;
+      }
       const p = toLocal(e);
       svg.classList.add("is-live");
       cross.setAttribute("transform", `translate(${p.x} ${p.y})`);
@@ -218,12 +238,15 @@ export default function ConstructedWordmark({
         <circle key={`p${i}`} className="fw-pulse" cx={x} cy={y} r={20} opacity={0} />
       ))}
       {CENTRES.map((_, li) => (
-        <g key={`L${li}`} className="fw-letter">
-          {strokes.map((d, i) =>
-            LETTER_OF_STROKE[i] === li ? <path key={`s${i}`} className="fw-stroke" d={d} pathLength={1} strokeWidth={SW} strokeLinecap="butt" data-stroke /> : null
-          )}
+        <g key={`L${li}`} className="fw-morph" data-letter={li}>
+          <g className="fw-letter">
+            {strokes.map((d, i) =>
+              LETTER_OF_STROKE[i] === li ? <path key={`s${i}`} className="fw-stroke" d={d} pathLength={1} strokeWidth={SW} strokeLinecap="butt" data-stroke /> : null
+            )}
+          </g>
         </g>
       ))}
+      <circle className="fw-lock" cx={MORPH.cx} cy={MORPH.archTop} r={7} opacity={0} />
       {nodes.map(([x, y], i) => (
         <circle key={`n${i}`} className="fw-node" cx={x} cy={y} r={5} />
       ))}

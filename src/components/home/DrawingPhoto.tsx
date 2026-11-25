@@ -47,6 +47,7 @@ const DrawingPhoto = forwardRef<
   const read = useRef<HTMLSpanElement>(null);
   const photoInk = useRef<SVGSVGElement>(null);
   const notes = useRef<SVGSVGElement>(null);
+  const last = useRef<{ x: number; y: number } | null>(null);
   const L = useRef({ x: 0.5, y: 0.45, hoverR: 0, scrollP: 0, toggled: false });
 
   const paint = useCallback(() => {
@@ -61,6 +62,7 @@ const DrawingPhoto = forwardRef<
     el.style.setProperty("--lens-x", `${s.x * w}px`);
     el.style.setProperty("--lens-y", `${s.y * h}px`);
     el.style.setProperty("--lens-r", `${r}px`);
+    el.style.setProperty("--scan-r", `${s.hoverR}px`);
     // Once the photograph is open, its linework settles back to a trace.
     el.classList.toggle("is-open", s.toggled || s.scrollP > 0.9);
     // Keep annotations inside the visible crop: hide notes that fall outside
@@ -152,7 +154,8 @@ const DrawingPhoto = forwardRef<
         },
       });
     };
-    const pos = (e: PointerEvent) => {
+    const pos = (e: { clientX: number; clientY: number }) => {
+      last.current = { x: e.clientX, y: e.clientY };
       const b = el.getBoundingClientRect();
       L.current.x = (e.clientX - b.left) / b.width;
       L.current.y = (e.clientY - b.top) / b.height;
@@ -166,6 +169,10 @@ const DrawingPhoto = forwardRef<
         read.current.style.transform = `translate(${e.clientX - b.left + 16}px, ${e.clientY - b.top + 16}px)`;
       }
       paint();
+    };
+    // The pane can move under a still pointer (scroll, resize): keep the lens on the pointer.
+    const follow = () => {
+      if (el.classList.contains("has-lens") && last.current) pos({ clientX: last.current.x, clientY: last.current.y });
     };
     const enter = (e: PointerEvent) => {
       el.classList.add("has-lens");
@@ -184,6 +191,8 @@ const DrawingPhoto = forwardRef<
     };
     const onResize = () => paint();
     window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", follow, { passive: true });
+    gsap.ticker.add(follow);
     if (fine) {
       el.addEventListener("pointerenter", enter);
       el.addEventListener("pointermove", pos);
@@ -192,6 +201,8 @@ const DrawingPhoto = forwardRef<
     return () => {
       tween?.kill();
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", follow);
+      gsap.ticker.remove(follow);
       el.removeEventListener("pointerenter", enter);
       el.removeEventListener("pointermove", pos);
       el.removeEventListener("pointerleave", leave);
@@ -210,6 +221,18 @@ const DrawingPhoto = forwardRef<
           ))}
         </g>
         <g strokeWidth={1.6} opacity={0.75}>
+          {d.soft?.map((p, i) => (
+            <path key={i} d={p} />
+          ))}
+        </g>
+      </svg>
+      <svg className="hero-ink hero-ink--scan" viewBox={`0 0 ${d.width} ${d.height}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g strokeWidth={2.4}>
+          {d.lines.map((p, i) => (
+            <path key={i} d={p} />
+          ))}
+        </g>
+        <g strokeWidth={1.8}>
           {d.soft?.map((p, i) => (
             <path key={i} d={p} />
           ))}

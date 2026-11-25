@@ -36,6 +36,8 @@ All content is in `src/content/`. Components only read from it.
 | `site.ts` | Name, contact details, Instagram, location, credit. Unconfirmed values are `null` and show as "To be confirmed". |
 | `projects.ts` | All projects. `group: "completed"` or `"study"` decides the section. |
 | `studio.ts` | Office film and photographs for Inside OSDO |
+| `films.ts` | Reels for the "On film" section. An entry without `src` shows as a labelled placeholder. |
+| `hero.ts` | Hero photographs and their traced drawings (lead image plus three panes) |
 | `approach.ts` | Title and project link for the "From plan to space" animation (`components/home/PlanToSpace.tsx`, an illustrative scroll-driven drawing) |
 | `hero.ts` + `drawings/` | Hero photograph and the line drawing registered to it |
 | `types.ts` | The content model: `Media`, `Project`, `ProjectBlock`, `Drawing` |

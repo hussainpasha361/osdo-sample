@@ -3,6 +3,7 @@ import CompletedProjects from "@/components/work/CompletedProjects";
 import InsideOsdo from "@/components/home/InsideOsdo";
 import PlanToSpace from "@/components/home/PlanToSpace";
 import ContactBand from "@/components/home/ContactBand";
+import Films from "@/components/home/Films";
 import { completedProjects, featuredProjects, flagship, studies } from "@/content/projects";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
         allLabel={studies.length ? "All projects, concepts and studies" : "All projects"}
       />
       <InsideOsdo />
+      <Films />
       <PlanToSpace />
       <ContactBand />
     </>
