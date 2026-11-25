@@ -170,9 +170,8 @@ export default function Hero() {
           .to(wsvg.querySelectorAll(".fw-guide, .fw-node"), { opacity: 0, duration: 0.06 }, 0.02)
           .to(letter(2), { rotation: -90, scaleX: MORPH.archScale, svgOrigin: `${MORPH.cx} ${MORPH.cy}`, duration: 0.1, ease: "power3.inOut" }, 0.05)
           .to(letter(3), { x: MORPH.oDx, y: MORPH.oDy, scale: MORPH.ring, svgOrigin: `${MORPH.oCx} ${MORPH.cy}`, duration: 0.11, ease: "power3.inOut" }, 0.06)
-          // The mark takes its two colours as it forms: orange arch, charcoal ring.
-          .to(strokesOf(2), { stroke: "#c36d38", duration: 0.08 }, 0.06)
-          .to(strokesOf(3), { stroke: "#252622", duration: 0.08 }, 0.06)
+          // The mark turns solid charcoal as it forms, like OSDO's own logo.
+          .to(strokesOf(2, 3), { stroke: "#252622", duration: 0.08 }, 0.06)
           .fromTo(wsvg.querySelector(".fw-lock"), { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.025, ease: "back.out(3)" }, 0.165)
           // ...then docks into the navigation bar.
           .set(word, { zIndex: 120, transformOrigin: "0 0" }, 0.19)

@@ -449,9 +449,6 @@ html.motion .clip--pending {
   width: auto;
   transition: transform 0.9s var(--ease-out-expo);
 }
-.nav-mark path {
-  fill: var(--color-orange);
-}
 .nav-logo:hover .nav-mark {
   transform: rotate(-12deg) scale(1.06);
 }
