@@ -170,12 +170,13 @@ export default function Hero() {
           .to(wsvg.querySelectorAll(".fw-guide, .fw-node"), { opacity: 0, duration: 0.06 }, 0.02)
           .to(letter(2), { rotation: -90, scaleX: MORPH.archScale, svgOrigin: `${MORPH.cx} ${MORPH.cy}`, duration: 0.1, ease: "power3.inOut" }, 0.05)
           .to(letter(3), { x: MORPH.oDx, y: MORPH.oDy, scale: MORPH.ring, svgOrigin: `${MORPH.oCx} ${MORPH.cy}`, duration: 0.11, ease: "power3.inOut" }, 0.06)
+          // The mark takes its two colours as it forms: orange arch, charcoal ring.
+          .to(strokesOf(2), { stroke: "#c36d38", duration: 0.08 }, 0.06)
+          .to(strokesOf(3), { stroke: "#252622", duration: 0.08 }, 0.06)
           .fromTo(wsvg.querySelector(".fw-lock"), { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.025, ease: "back.out(3)" }, 0.165)
-          // ...then docks into the navigation bar, taking the mark's colours.
+          // ...then docks into the navigation bar.
           .set(word, { zIndex: 120, transformOrigin: "0 0" }, 0.19)
           .to(word, { x: () => dock().x, y: () => dock().y, scale: () => dock().s, duration: 0.11, ease: "power3.inOut" }, 0.19)
-          .to(strokesOf(2), { stroke: "#c36d38", duration: 0.06 }, 0.19)
-          .to(strokesOf(3), { stroke: "#252622", duration: 0.06 }, 0.19)
           .to(wsvg.querySelector(".fw-lock"), { opacity: 0, duration: 0.03 }, 0.25)
           .to(word, { opacity: 0, duration: 0.025 }, 0.295)
           .fromTo(".nav-mark", { scale: 1 }, { scale: 1.3, duration: 0.02, ease: "power2.out", yoyo: true, repeat: 1 }, 0.29)

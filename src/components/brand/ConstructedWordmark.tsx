@@ -189,8 +189,10 @@ export default function ConstructedWordmark({
     };
     const leave = () => {
       svg.classList.remove("is-live");
+      // While the hero morph owns the letters, leave their colours alone.
+      const morphing = !!svg.closest(".is-morphing");
       letters.forEach((g, i) => {
-        g.querySelectorAll<SVGPathElement>(".fw-stroke").forEach((s) => (s.style.stroke = ""));
+        if (!morphing) g.querySelectorAll<SVGPathElement>(".fw-stroke").forEach((s) => (s.style.stroke = ""));
         if (moving) {
           movers[i].x(0);
           movers[i].y(0);
