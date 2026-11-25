@@ -63,11 +63,28 @@ const CENTRES: [number, number][] = [
   [O2.cx, MID],
 ];
 const ORANGE = [195, 109, 56];
-const IVORY = [234, 230, 219];
-const tint = (k: number) => `rgb(${IVORY.map((v, i) => Math.round(v + (ORANGE[i] - v) * k)).join(",")})`;
+const BASES = { light: [234, 230, 219], dark: [89, 99, 68] };
+const tint = (base: number[], k: number) => `rgb(${base.map((v, i) => Math.round(v + (ORANGE[i] - v) * k)).join(",")})`;
 
-export default function ConstructedWordmark({ className = "" }: { className?: string }) {
+/**
+ * tone "light": ivory strokes (footer, on olive). tone "dark": olive strokes on ivory (hero).
+ * drawOn "load" draws immediately (hero); "scroll" waits until it enters view.
+ */
+export default function ConstructedWordmark({
+  className = "",
+  tone = "light",
+  drawOn = "scroll",
+  delay = 0,
+  label = "OSDO",
+}: {
+  className?: string;
+  tone?: "light" | "dark";
+  drawOn?: "load" | "scroll";
+  delay?: number;
+  label?: string;
+}) {
   const ref = useRef<SVGSVGElement>(null);
+  const base = BASES[tone];
   const drawn = useRef(false);
 
   useGSAP(
@@ -79,7 +96,7 @@ export default function ConstructedWordmark({ className = "" }: { className?: st
         return;
       }
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: svg, start: "top 85%", once: true },
+        ...(drawOn === "scroll" ? { scrollTrigger: { trigger: svg, start: "top 85%", once: true } } : { delay }),
         onComplete: () => {
           svg.classList.remove("draw--pending");
           drawn.current = true;
@@ -137,7 +154,7 @@ export default function ConstructedWordmark({ className = "" }: { className?: st
         const dx = p.x - cx;
         const dy = p.y - cy;
         const k = Math.max(0, 1 - Math.hypot(dx, dy) / 240);
-        g.querySelectorAll<SVGPathElement>(".fw-stroke").forEach((s) => (s.style.stroke = tint(k)));
+        g.querySelectorAll<SVGPathElement>(".fw-stroke").forEach((s) => (s.style.stroke = tint(base, k)));
         if (moving) {
           movers[i].x(dx * 0.08 * k);
           movers[i].y(dy * 0.08 * k);
@@ -185,10 +202,10 @@ export default function ConstructedWordmark({ className = "" }: { className?: st
       svg.removeEventListener("pointerleave", leave);
       svg.removeEventListener("pointerdown", click);
     };
-  }, []);
+  }, [base]);
 
   return (
-    <svg ref={ref} className={`footer-word draw--pending ${className}`} viewBox={`0 0 ${W} ${H}`} role="img" aria-label="OSDO">
+    <svg ref={ref} className={`footer-word footer-word--${tone} draw--pending ${className}`} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
       {guides.map((d, i) => (
         <path key={`g${i}`} className="fw-guide" d={d} pathLength={1} data-stroke />
       ))}

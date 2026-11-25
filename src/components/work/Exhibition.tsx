@@ -9,13 +9,19 @@ import { gsap, useGSAP, motionOK } from "@/lib/gsap";
 import type { Media as M, Project } from "@/content/types";
 
 /**
- * Gallery mode: each project hung as its own composition, set against a
- * coloured architectural plane (orange, olive, timber in turn) that slides in
- * as the composition arrives. The flagship opens the exhibition; the others
- * are arranged by the shape of their cover.
+ * Gallery mode: each project hung as its own composition, framed with the
+ * studio's own vocabulary: steel-grid boxes behind the cover (like the office
+ * shelving), companion images in arches, and fluted vertical-line panels.
+ * Orange is kept to fine accents. The first project opens the exhibition;
+ * the others are arranged by the shape of their cover.
  */
 
-const PLANES = ["orange", "olive", "timber"] as const;
+function GridBox({ className }: { className: string }) {
+  return <span className={`ex-grid ${className}`} aria-hidden="true" />;
+}
+function Fluted({ className }: { className: string }) {
+  return <span className={`ex-flute ${className}`} aria-hidden="true" />;
+}
 
 function Marks({ num }: { num: string }) {
   return (
@@ -35,11 +41,12 @@ function Marks({ num }: { num: string }) {
 
 const tagOf = (m: M) => (m.role === "before" ? "Before" : m.role === "after" ? "After" : undefined);
 
-function Frame({ m, ratio, sizes, num, drift = 3 }: { m: M; ratio?: string; sizes: string; num?: string; drift?: number }) {
+function Frame({ m, ratio, sizes, num, drift = 3, arch = false }: { m: M; ratio?: string; sizes: string; num?: string; drift?: number; arch?: boolean }) {
   const tag = tagOf(m);
   return (
-    <div className="ex-frame">
-      <ClipReveal drift={drift}>
+    <div className={`ex-frame ${arch ? "ex-frame--arch" : ""}`}>
+      {arch ? <span className="ex-arch-line" aria-hidden="true" /> : null}
+      <ClipReveal drift={drift} className={arch ? "arch" : ""}>
         <Media media={m} ratio={ratio} sizes={sizes} />
       </ClipReveal>
       {num ? <Marks num={num} /> : null}
@@ -92,13 +99,16 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
   useGSAP(
     () => {
       if (!motionOK()) return;
-      gsap.utils.toArray<HTMLElement>(".ex-plane", root.current).forEach((plane) => {
-        gsap.fromTo(
-          plane,
-          { scaleX: 0 },
-          { scaleX: 1, ease: "power2.out", scrollTrigger: { trigger: plane.parentElement, start: "top 85%", end: "top 30%", scrub: 0.8 } }
-        );
-      });
+      const st = (el: Element) => ({ trigger: el.parentElement, start: "top 88%", end: "top 35%", scrub: 0.8 });
+      gsap.utils.toArray<HTMLElement>(".ex-grid", root.current).forEach((el) =>
+        gsap.fromTo(el, { clipPath: "inset(0% 100% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", ease: "power2.out", scrollTrigger: st(el) })
+      );
+      gsap.utils.toArray<HTMLElement>(".ex-flute", root.current).forEach((el) =>
+        gsap.fromTo(el, { scaleY: 0 }, { scaleY: 1, ease: "power2.out", scrollTrigger: st(el) })
+      );
+      gsap.utils.toArray<HTMLElement>(".ex-arch-line", root.current).forEach((el) =>
+        gsap.fromTo(el, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", ease: "power2.out", scrollTrigger: { trigger: el, start: "top 95%", end: "top 45%", scrub: 0.8 } })
+      );
     },
     { scope: root, dependencies: [projects.length] }
   );
@@ -106,32 +116,29 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
   let uprightTurn = 0;
   return (
     <ol ref={root} className="ex" aria-label="Projects">
-      {projects.map((p, i) => {
+      {projects.map((p) => {
         const href = `/work/${p.slug}`;
         const label = `View ${p.title}`;
         const second = companion(p);
-        const plane = PLANES[i % PLANES.length];
 
         if (p.slug === flagshipSlug) {
           return (
             <li key={p.slug} className="ex-item ex-flagship grid-12 gap-y-8">
-              <span className={`ex-plane ex-plane--${plane} ex-plane--flag`} aria-hidden="true" />
-              <Link href={href} className="ex-link col-span-6 md:col-span-7" data-cursor="View project" aria-label={label}>
+              <Link href={href} className="ex-link col-span-6 md:col-span-7 relative" data-cursor="View project" aria-label={label}>
+                <GridBox className="ex-grid--br" />
                 <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 56vw, 100vw" num={p.number} />
               </Link>
               <div className="col-span-6 md:col-start-9 md:col-span-4 flex flex-col gap-10">
                 <div>
-                  <p className="flex items-end gap-4">
-                    <Num n={p.number} />
-                    <span className="t-note text-graphite pb-2">Flagship project</span>
-                  </p>
+                  <Num n={p.number} />
                   <Link href={href} className="t-xl mt-4 block ex-flag-title ex-title" tabIndex={-1}>
                     {p.title}
                   </Link>
                   <Meta p={p} className="mt-4" />
                 </div>
-                <div className="md:mt-auto w-2/3 self-end md:w-full" aria-hidden="true">
-                  <Frame m={second} ratio="3 / 4" sizes="(min-width: 768px) 30vw, 60vw" drift={5} />
+                <div className="md:mt-auto w-2/3 self-end md:w-[86%] relative" aria-hidden="true">
+                  <Fluted className="ex-flute--side" />
+                  <Frame m={second} ratio="3 / 4" sizes="(min-width: 768px) 30vw, 60vw" drift={5} arch />
                 </div>
               </div>
             </li>
@@ -141,7 +148,6 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
         if (orientationOf(p.cover) === "landscape") {
           return (
             <li key={p.slug} className="ex-item grid-12 items-end gap-y-6">
-              <span className={`ex-plane ex-plane--${plane} ex-plane--land`} aria-hidden="true" />
               <div className="col-span-6 order-2 md:order-1 md:col-span-3 md:pb-2">
                 <Num n={p.number} />
                 <Link href={href} className="t-xl mt-3 block ex-title" tabIndex={-1}>
@@ -149,7 +155,9 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
                 </Link>
                 <Meta p={p} className="mt-3" />
               </div>
-              <Link href={href} className="ex-link col-span-6 order-1 md:order-2 md:col-start-5 md:col-span-8" data-cursor="View project" aria-label={label}>
+              <Link href={href} className="ex-link col-span-6 order-1 md:order-2 md:col-start-5 md:col-span-8 relative" data-cursor="View project" aria-label={label}>
+                <Fluted className="ex-flute--left" />
+                <GridBox className="ex-grid--tr" />
                 <Frame m={p.cover} sizes="(min-width: 768px) 66vw, 100vw" num={p.number} />
               </Link>
             </li>
@@ -160,23 +168,24 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
         if (v === 0)
           return (
             <li key={p.slug} className="ex-item grid-12 gap-y-6">
-              <span className={`ex-plane ex-plane--${plane} ex-plane--up`} aria-hidden="true" />
-              <Link href={href} className="ex-link col-span-6 md:col-start-2 md:col-span-5" data-cursor="View project" aria-label={label}>
+              <Link href={href} className="ex-link col-span-6 md:col-start-2 md:col-span-5 relative" data-cursor="View project" aria-label={label}>
+                <GridBox className="ex-grid--tl" />
                 <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 40vw, 100vw" num={p.number} />
                 <Caption p={p} />
               </Link>
               <div className="col-span-4 col-start-3 md:col-start-8 md:col-span-4 md:mt-[30%]" aria-hidden="true">
-                <Frame m={second} sizes="(min-width: 768px) 32vw, 66vw" drift={5} />
+                <Frame m={second} ratio="4 / 5" sizes="(min-width: 768px) 32vw, 66vw" drift={5} arch />
               </div>
             </li>
           );
         return (
           <li key={p.slug} className="ex-item grid-12 gap-y-6">
-            <span className={`ex-plane ex-plane--${plane} ex-plane--up2`} aria-hidden="true" />
-            <div className="col-span-3 mt-[30%] md:col-span-3 md:col-start-1 md:mt-[22%]" aria-hidden="true">
-              <Frame m={second} ratio="4 / 5" sizes="(min-width: 768px) 25vw, 50vw" drift={5} />
+            <div className="col-span-3 mt-[30%] md:col-span-3 md:col-start-1 md:mt-[22%] relative" aria-hidden="true">
+              <Fluted className="ex-flute--side" />
+              <Frame m={second} ratio="4 / 5" sizes="(min-width: 768px) 25vw, 50vw" drift={5} arch />
             </div>
-            <Link href={href} className="ex-link col-span-3 md:col-start-5 md:col-span-5" data-cursor="View project" aria-label={label}>
+            <Link href={href} className="ex-link col-span-3 md:col-start-5 md:col-span-5 relative" data-cursor="View project" aria-label={label}>
+              <GridBox className="ex-grid--br" />
               <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 40vw, 50vw" num={p.number} />
               <Caption p={p} />
             </Link>

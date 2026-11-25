@@ -4,6 +4,9 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP, motionOK } from "@/lib/gsap";
 import { hero } from "@/content/hero";
+import { studioPhotos } from "@/content/studio";
+import ConstructedWordmark from "@/components/brand/ConstructedWordmark";
+import HeroTools from "./HeroTools";
 import { site } from "@/content/site";
 import type { Drawing } from "@/content/types";
 
@@ -80,6 +83,16 @@ export default function Hero() {
     return { left: vw - margin - width, top: navH + 60, width, height };
   }, [d.width, d.height]);
 
+  /** Final state: four panes in a steel glazing grid; the drawing frame becomes the last pane. */
+  const paneRect = useCallback((i: number): Rect => {
+    const vw = document.documentElement.clientWidth;
+    const vh = window.innerHeight;
+    const pad = 12;
+    const gap = 12;
+    const w = (vw - pad * 2 - gap * 3) / 4;
+    return { left: pad + i * (w + gap), top: pad, width: w, height: vh - pad * 2 };
+  }, []);
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 900px)");
     const set = () => setDesktop(mq.matches);
@@ -127,8 +140,7 @@ export default function Hero() {
       const ok = motionOK();
       if (ok) {
         const tl = gsap.timeline({ delay: 0.15 });
-        tl.fromTo(el.querySelectorAll(".hw-l"), { y: 0, yPercent: 102 }, { yPercent: 0, duration: 1.3, stagger: 0.07, ease: "expo.out" }, 0)
-          .fromTo(el.querySelectorAll("[data-hero-fade]"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: "power2.out" }, 0.2)
+        tl.fromTo(el.querySelectorAll("[data-hero-fade]"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: "power2.out" }, 0.2)
           .fromTo(el.querySelectorAll('.hero-ink--paper [data-layer="lines"] [data-stroke]'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.5, ease: "power2.inOut", stagger: { amount: 0.7 } }, 0.25)
           .fromTo(el.querySelectorAll('.hero-ink--paper [data-layer="soft"] [data-stroke]'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: "power2.out", stagger: { amount: 0.9 } }, 0.9)
           .fromTo(el.querySelectorAll(".hero-note"), { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.12 }, 1.6)
@@ -153,20 +165,36 @@ export default function Hero() {
             },
           },
         });
-        tl.to(f, { left: 0, top: 0, width: () => document.documentElement.clientWidth, height: () => window.innerHeight, ease: "power2.inOut", duration: 0.6, onUpdate: paint }, 0.35)
-          .to(el.querySelectorAll(".hero-guides, .hero-toggle, .hero-cue"), { opacity: 0, duration: 0.15 }, 0)
+        const panes = gsap.utils.toArray<HTMLElement>(".hero-pane", el);
+        tl.to(f, { left: () => paneRect(3).left, top: () => paneRect(3).top, width: () => paneRect(3).width, height: () => paneRect(3).height, ease: "power2.inOut", duration: 0.5, onUpdate: paint }, 0.35)
+          .to(el.querySelectorAll(".hero-guides-wrap, .hero-toggle, .hero-cue"), { opacity: 0, duration: 0.15 }, 0)
           .to(el.querySelectorAll(".hero-note"), { opacity: 0, duration: 0.15 }, 0)
           .to(f, { outlineColor: "rgba(195,109,56,0)", outlineOffset: 0, duration: 0.25 }, 0.3)
-          .to(el.querySelector(".hero-ident"), { yPercent: -30, opacity: 0, duration: 0.3 }, 0.35)
+          .to(el.querySelectorAll(".hero-ident, .hero-word"), { opacity: 0, y: -24, duration: 0.25, stagger: 0.04 }, 0.32)
+          .to(el.querySelector(".hero-tools"), { opacity: 0, duration: 0.3 }, 0.35)
           .to(el.querySelector(".hero-ink--paper"), { opacity: 0, duration: 0.3 }, 0.3)
-          .to(el.querySelector(".hero-ink--photo"), { opacity: 0.18, duration: 0.4 }, 0.3)
-          .to(el.querySelector(".hero-word"), { color: "#eae6db", duration: 0.25 }, 0.6)
+          .to(el.querySelector(".hero-ink--photo"), { opacity: 0, duration: 0.3 }, 0.45)
+          .fromTo(el.querySelector(".hero-steel"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.55)
+          .fromTo(panes, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.32, stagger: 0.07, ease: "power3.out" }, 0.58)
+          .fromTo(panes.map((p) => p.querySelector("img")), { scale: 1.2 }, { scale: 1, duration: 0.45, stagger: 0.07, ease: "power2.out" }, 0.58)
+          .fromTo(el.querySelector(".hero-transom"), { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "power2.inOut" }, 0.82)
+          .fromTo(el.querySelectorAll(".hero-pane-cap"), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.1, stagger: 0.03 }, 0.88)
           .to({}, { duration: 0.05 });
+        const placePanes = () =>
+          gsap.set(panes, {
+            left: (i: number) => paneRect(i).left,
+            top: (i: number) => paneRect(i).top,
+            width: (i: number) => paneRect(i).width,
+            height: (i: number) => paneRect(i).height,
+          });
+        placePanes();
+        const onResize = placePanes;
+        window.addEventListener("resize", onResize);
         // Ivory navigation while the photograph fills the screen.
         const nav = document.querySelector<HTMLElement>(".nav");
         const st = ScrollTrigger.create({
           trigger: el,
-          start: () => `top+=${(el.offsetHeight - window.innerHeight) * 0.6} top`,
+          start: () => `top+=${(el.offsetHeight - window.innerHeight) * 0.55} top`,
           end: "bottom top+=36",
           invalidateOnRefresh: true,
           onToggle: (s) => {
@@ -176,6 +204,7 @@ export default function Hero() {
           },
         });
         return () => {
+          window.removeEventListener("resize", onResize);
           st.kill();
           lens.current.scrollP = 0;
           paint();
@@ -341,14 +370,17 @@ export default function Hero() {
           <i />
         </div>
 
-        {guideRect ? (
-          <svg ref={guides} className="hero-guides" viewBox={`0 0 ${guideRect.vw} ${guideRect.vh}`} aria-hidden="true">
-            {guideEls}
-          </svg>
-        ) : null}
+        <div className="hero-guides-wrap" aria-hidden="true">
+          {guideRect ? (
+            <svg ref={guides} className="hero-guides" viewBox={`0 0 ${guideRect.vw} ${guideRect.vh}`}>
+              {guideEls}
+            </svg>
+          ) : null}
+        </div>
+
+        <HeroTools />
 
         <div className="hero-ident" data-hero-fade>
-          <span className="hero-ident-mark" aria-hidden="true" />
           <h1 id="hero-title" className="t-m">
             {site.nameLines.map((l) => (
               <span key={l} className="block">
@@ -357,11 +389,27 @@ export default function Hero() {
             ))}
           </h1>
           <p className="t-small mt-2 hero-ident-sub">{site.descriptor}</p>
-          <p className="hero-cue t-small" aria-hidden="true">
-            <span />
-            Scroll to open the drawing
-          </p>
         </div>
+
+        <p className="hero-cue t-small" aria-hidden="true" data-hero-fade>
+          <span />
+          Scroll to open the drawing
+        </p>
+
+        {(
+          <>
+            <div className="hero-steel" aria-hidden="true" />
+            {[studioPhotos[1], studioPhotos[2], studioPhotos[3]].map((m, i) =>
+              m.kind === "image" ? (
+                <figure key={m.src} className="hero-pane" style={{ position: "absolute" }}>
+                  <Image src={m.src} alt={m.alt} fill sizes="25vw" style={{ objectFit: "cover", objectPosition: m.focus ?? "50% 50%" }} />
+                  <figcaption className="hero-pane-cap t-note">{["Steel and oak", "Fluted wall, olive door", "Planters, timber bench"][i]}</figcaption>
+                </figure>
+              ) : null
+            )}
+            <span className="hero-transom" aria-hidden="true" />
+          </>
+        )}
 
         <div ref={frame} className={`hero-frame ${mode === "photo" ? "is-photo" : ""}`}>
           <Ink d={d} className="hero-ink--paper draw--pending" idPrefix="p" />
@@ -401,13 +449,9 @@ export default function Hero() {
           </div>
         </div>
 
-        <p className="hero-word t-mega" aria-hidden="true">
-          {"OSDO".split("").map((c, i) => (
-            <span key={i} className="inline-block overflow-clip pb-[0.04em] align-top">
-              <span className="hw-l inline-block">{c}</span>
-            </span>
-          ))}
-        </p>
+        <div className="hero-word">
+          <ConstructedWordmark tone="dark" drawOn="load" delay={0.35} label="OSDO" />
+        </div>
 
       </div>
     </section>

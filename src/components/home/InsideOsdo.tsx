@@ -70,7 +70,8 @@ export default function InsideOsdo({ standalone = false }: { standalone?: boolea
           <figcaption className="inside-cap t-note">Studio film, provisional cut</figcaption>
         </figure>
 
-        <figure className="col-span-3 md:col-span-3 md:col-start-10 md:mt-[46%]">
+        <figure className="col-span-3 md:col-span-3 md:col-start-10 md:mt-[46%] relative isolate">
+          <span className="ex-grid inside-grid" aria-hidden="true" />
           <Parallax speed={6}>
             <ClipReveal drift={3}>
               <Media media={shelving} ratio="4 / 5" sizes="(min-width: 768px) 25vw, 50vw" />
@@ -80,7 +81,7 @@ export default function InsideOsdo({ standalone = false }: { standalone?: boolea
         </figure>
 
         <figure className="col-span-3 md:col-span-3 md:col-start-1 md:-mt-[30%] mt-16 relative">
-          <span className="inside-plane" aria-hidden="true" />
+          <span className="ex-flute inside-flute" aria-hidden="true" />
           <Parallax speed={10}>
             <ClipReveal drift={3}>
               <Media media={door} ratio="3 / 4" sizes="(min-width: 768px) 25vw, 50vw" />
