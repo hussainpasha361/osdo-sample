@@ -1,31 +1,18 @@
-import Loader from "@/components/Loader";
-import Cursor from "@/components/Cursor";
-import Nav from "@/components/Nav";
-import Hero from "@/components/Hero";
-import Works from "@/components/Works";
-import Practice from "@/components/Practice";
-import Motion from "@/components/Motion";
-import { Reel, Manifesto, Featured, Process, Studio, Contact, Footer } from "@/components/Sections";
+import Hero from "@/components/home/Hero";
+import CompletedProjects from "@/components/work/CompletedProjects";
+import InsideOsdo from "@/components/home/InsideOsdo";
+import Approach from "@/components/home/Approach";
+import ContactBand from "@/components/home/ContactBand";
+import { featuredProjects, projects } from "@/content/projects";
 
-export default function Page() {
+export default function Home() {
   return (
     <>
-      <Loader />
-      <Cursor />
-      <Nav />
-      <main id="main">
-        <Hero />
-        <Reel />
-        <Manifesto />
-        <Works />
-        <Featured />
-        <Practice />
-        <Process />
-        <Studio />
-        <Contact />
-      </main>
-      <Footer />
-      <Motion />
+      <Hero />
+      <CompletedProjects projects={featuredProjects} total={projects.length} showAllLink />
+      <InsideOsdo />
+      <Approach />
+      <ContactBand />
     </>
   );
 }

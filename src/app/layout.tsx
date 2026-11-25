@@ -1,36 +1,50 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, IBM_Plex_Mono, Instrument_Serif } from "next/font/google";
-import { site } from "@/data/site";
+import { Funnel_Display, Funnel_Sans, Geist_Mono } from "next/font/google";
+import { site } from "@/content/site";
+import { TransitionProvider } from "@/components/layout/PageTransition";
+import SmoothScroll from "@/components/layout/SmoothScroll";
+import Nav from "@/components/layout/Nav";
+import Footer from "@/components/layout/Footer";
+import Cursor from "@/components/layout/Cursor";
+import GridOverlay from "@/components/layout/GridOverlay";
 import "./globals.css";
 
-const sans = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--f-sans", display: "swap" });
-const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--f-mono", display: "swap" });
-const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--f-serif", display: "swap" });
-
-const title = `${site.name} | ${site.fullName}`;
-const description = "Ovais & Shahzad Design Office: architecture, interiors and landscape, drawn from the plan up.";
+const display = Funnel_Display({ subsets: ["latin"], variable: "--f-display", display: "swap" });
+const sans = Funnel_Sans({ subsets: ["latin"], variable: "--f-sans", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--f-mono", display: "swap", weight: ["400"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title,
-  description,
-  openGraph: { title, description, type: "website", siteName: site.name },
+  title: { default: `${site.name} | ${site.fullName}`, template: `%s | ${site.name}` },
+  description: `${site.fullName}. ${site.descriptor}.`,
+  openGraph: { siteName: site.name, type: "website" },
 };
 
-export const viewport: Viewport = { themeColor: "#ECE9E2", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#eae6db", width: "device-width", initialScale: 1 };
 
 // Before paint: opt into motion unless reduced motion is requested. Hidden
-// pre-animation states only apply under html.motion, so nothing is lost
-// without JavaScript. A 4s fail-safe drops motion if scripts never start.
-const boot = `(function(d){d.classList.add('js');try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion');setTimeout(function(){if(!d.classList.contains('motion-ready'))d.classList.remove('motion')},4000)}}catch(e){}})(document.documentElement)`;
+// pre-animation states only apply under html.motion; a fail-safe removes it
+// if scripts never start, so content is never stranded.
+const boot = `(function(d){try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion');setTimeout(function(){if(!d.classList.contains('motion-ready'))d.classList.remove('motion')},4000)}}catch(e){}})(document.documentElement)`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable} ${serif.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: boot }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <TransitionProvider>
+          <SmoothScroll />
+          <Nav />
+          <main id="main" tabIndex={-1} className="outline-none">
+            {children}
+          </main>
+          <Footer />
+          <Cursor />
+          <GridOverlay />
+        </TransitionProvider>
+      </body>
     </html>
   );
 }
