@@ -1,0 +1,16 @@
+{
+  "slug": "bella-pizzeria",
+  "title": "Bella Pizzeria",
+  "category": "Hospitality",
+  "caption": "A rooftop dining space framed by warm lighting, textured walls, timber and green seating.",
+  "cover": "bella-02.webp",
+  "gallery": [
+    "bella-02.webp",
+    "bella-01.webp",
+    "bella-03.webp",
+    "bella-04.webp",
+    "bella-05.webp"
+  ],
+  "video": "bella-reel.mp4",
+  "videoStatus": "cropped screen recording; replace with original if available"
+}

@@ -18,12 +18,21 @@ export default function CompletedProjects({
   showAllLink = false,
   headingLevel = "h2",
   id = "completed-projects",
+  title = "Completed Projects",
+  note,
+  flagshipSlug,
+  allLabel = "All projects",
 }: {
   projects: Project[];
   total?: number;
   showAllLink?: boolean;
   headingLevel?: "h1" | "h2";
   id?: string;
+  title?: string;
+  /** One line under the heading, only where context is needed. */
+  note?: string;
+  flagshipSlug?: string;
+  allLabel?: string;
 }) {
   const [mode, setMode] = useState<"gallery" | "index">("gallery");
   const [filter, setFilter] = useState<string>("All");
@@ -40,7 +49,8 @@ export default function CompletedProjects({
     <section className="cp" id={id} aria-labelledby={`${id}-title`}>
       <div className="cp-head grid-12">
         <div className="cp-title">
-          <RevealText as={headingLevel} id={`${id}-title`} className="t-xxl" text="Completed Projects" />
+          <RevealText as={headingLevel} id={`${id}-title`} className="t-xxl" text={title} />
+          {note ? <p className="t-small text-graphite mt-5 max-w-[52ch]">{note}</p> : null}
           <span className="t-note num mt-4 block md:hidden">{count} projects</span>
         </div>
         <div className="cp-tools">
@@ -56,7 +66,7 @@ export default function CompletedProjects({
             </button>
           </div>
         </div>
-        {categories.length > 1 ? (
+        {categories.length > 1 && projects.length > 4 ? (
           <div className="col-span-full flex flex-wrap gap-4 pt-2" role="group" aria-label="Filter by type">
             {["All", ...categories].map((c) => (
               <button key={c} type="button" className="mode-btn" aria-pressed={filter === c} onClick={() => setFilter(c)}>
@@ -67,13 +77,12 @@ export default function CompletedProjects({
         ) : null}
       </div>
 
-      {mode === "gallery" ? <Exhibition projects={list} /> : <ProjectIndex projects={list} />}
+      {mode === "gallery" ? <Exhibition projects={list} flagshipSlug={flagshipSlug} /> : <ProjectIndex projects={list} />}
 
       {showAllLink ? (
         <div className="wrap -mt-[calc(var(--section)*0.5)] pb-[var(--section)]">
           <Link href="/work" className="btn-line" data-cursor="Open archive">
-            <span>All completed projects</span>
-            <span className="num t-note">({count})</span>
+            <span>{allLabel}</span>
           </Link>
         </div>
       ) : null}

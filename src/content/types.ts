@@ -23,10 +23,16 @@ type MediaBase = {
    * material awaiting a higher-quality original, `final` = approved.
    */
   status: "placeholder" | "temporary" | "provisional" | "final";
+  /** What the image is, when it matters to the layout or its label. */
+  role?: "plan" | "before" | "after" | "render";
+  /** Short visible label, e.g. "Existing plan". Shown as an annotation. */
+  label?: string;
+  /** Paper colour behind drawings shown with object-fit: contain. */
+  paper?: string;
 };
 
 export type ImageMedia = MediaBase & { kind: "image"; src: string };
-export type VideoMedia = MediaBase & { kind: "video"; src: string; poster?: string; loop?: boolean };
+export type VideoMedia = MediaBase & { kind: "video"; src: string; poster?: string; loop?: boolean; /** false = plays only when asked */ autoplay?: boolean };
 export type PlaceholderMedia = MediaBase & {
   kind: "placeholder";
   tone: PlateTone;
@@ -47,11 +53,15 @@ export type ProjectBlock =
   | { type: "pair"; media: [Media, Media] }
   | { type: "trio"; media: [Media, Media, Media] }
   | { type: "drawing"; media: Media; note?: string }
+  | { type: "plans"; media: Media[]; note?: string }
+  | { type: "chapter"; label: string; count?: number }
   | { type: "video"; media: Media }
   | { type: "text"; text: string };
 
 export type Project = {
   slug: string;
+  /** Completed work, or concepts and design studies (kept separate). */
+  group: "completed" | "study";
   /** Display number, e.g. "01". Derived from order when omitted. */
   number?: string;
   title: string;
@@ -63,6 +73,17 @@ export type Project = {
   credits?: { label: string; value: string }[];
   /** One or two sentences at most. Optional. */
   summary?: string;
+  /** Status line where completion is not confirmed, e.g. "Completion to be confirmed". */
+  status?: string;
+  /** How the imagery was made, e.g. "AI-enhanced imagery". Shown wherever the project appears. */
+  mediaNote?: string;
+  /** Set when the title is a working title. */
+  titleNote?: string;
+  /**
+   * Before-and-after projects: plans and photograph sets presented as
+   * separate, labelled chapters (camera angles differ, so no slider).
+   */
+  transformation?: { plans: [Media, Media]; before: Media[]; after: Media[] };
   cover: Media;
   /** All project media in preferred order. */
   media: Media[];

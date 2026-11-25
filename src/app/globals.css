@@ -1433,6 +1433,132 @@ html.has-cursor .cursor {
   border-top: 1px solid var(--line);
 }
 
+/* ---------- project presentation ---------- */
+.fig-note {
+  display: block;
+  padding-top: 10px;
+  color: var(--color-graphite);
+}
+.tf-after .fig-note,
+.inside .fig-note {
+  color: rgb(234 230 219 / 0.72);
+}
+.pj-hero--split {
+  padding-bottom: clamp(24px, 4vw, 64px);
+}
+.pj-title {
+  overflow-wrap: anywhere;
+}
+.pj-chapter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-charcoal);
+}
+.pj-chapter--light {
+  color: var(--color-ivory);
+}
+.pj-chapter-rule {
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.18;
+  margin-left: 6px;
+}
+.plan-node {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-orange);
+  flex: none;
+}
+.plan-sheet {
+  padding-block: clamp(48px, 7vw, 112px);
+  position: relative;
+}
+.plan-sheet::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgb(37 38 34 / 0.045) 1px, transparent 1px), linear-gradient(90deg, rgb(37 38 34 / 0.045) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.plan {
+  position: relative;
+  transition: opacity 0.5s var(--ease-out-quart), transform 0.8s var(--ease-out-expo);
+}
+.plan .media {
+  background: transparent;
+  box-shadow: 0 1px 0 rgb(37 38 34 / 0.06), 0 18px 40px -24px rgb(37 38 34 / 0.35);
+}
+.plan-cap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+}
+@media (hover: hover) {
+  .plan-sheet:has(.plan:hover) .plan:not(:hover) {
+    opacity: 0.42;
+  }
+  .plan:hover {
+    transform: translateY(-6px);
+  }
+}
+.tf-before {
+  background: var(--color-ivory-2);
+  padding-block: clamp(56px, 8vw, 128px);
+}
+.tf-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gutter);
+  padding-inline: var(--margin);
+}
+@media (max-width: 767px) {
+  .tf-strip {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+  .tf-strip::-webkit-scrollbar {
+    display: none;
+  }
+  .tf-strip-item {
+    flex: 0 0 78vw;
+    scroll-snap-align: start;
+    scroll-margin-left: var(--margin);
+  }
+}
+.tf-after {
+  background: var(--color-olive);
+  color: var(--color-ivory);
+  padding-block: clamp(64px, 9vw, 150px);
+}
+.film-btn--big {
+  padding: 13px 18px;
+  font-size: 14px;
+  background: rgb(37 38 34 / 0.7);
+}
+.ap-tag {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  padding: 6px 9px;
+  background: rgb(234 230 219 / 0.92);
+  color: var(--color-charcoal);
+}
+.ex-flag-title {
+  overflow-wrap: anywhere;
+}
+.pj-next-title {
+  font-size: clamp(28px, 3.4vw, 60px);
+  overflow-wrap: anywhere;
+}
+
 /* =====================================================================
    Form
    ===================================================================== */

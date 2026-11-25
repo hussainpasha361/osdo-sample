@@ -1,0 +1,82 @@
+{
+  "id": "04",
+  "title": "Residential Transformation",
+  "title_status": "working title; official name unconfirmed",
+  "location": "Karachi, Pakistan (Instagram post location)",
+  "category": "Residential renovation",
+  "status": "before-and-after project; completion date unconfirmed",
+  "description": "An existing veranda reimagined as a warm seating area with timber detailing, exposed brick, stone and layered lighting.",
+  "cover": "after/07-renovated-lounge.webp",
+  "assets": [
+    {
+      "path": "plans/01-existing-plan.webp",
+      "type": "floor_plan",
+      "alt": "Existing plan",
+      "width": 709,
+      "height": 672
+    },
+    {
+      "path": "plans/02-proposed-plan.webp",
+      "type": "floor_plan",
+      "alt": "Proposed plan",
+      "width": 709,
+      "height": 744
+    },
+    {
+      "path": "before/03-existing-entrance.webp",
+      "type": "before_photo",
+      "alt": "Existing entrance",
+      "width": 709,
+      "height": 728
+    },
+    {
+      "path": "before/04-existing-seating.webp",
+      "type": "before_photo",
+      "alt": "Existing seating",
+      "width": 709,
+      "height": 728
+    },
+    {
+      "path": "before/05-existing-veranda.webp",
+      "type": "before_photo",
+      "alt": "Existing veranda",
+      "width": 709,
+      "height": 728
+    },
+    {
+      "path": "after/06-renovated-entrance.webp",
+      "type": "after_photo",
+      "alt": "Renovated entrance",
+      "width": 709,
+      "height": 728
+    },
+    {
+      "path": "after/07-renovated-lounge.webp",
+      "type": "after_photo",
+      "alt": "Renovated lounge",
+      "width": 709,
+      "height": 728
+    },
+    {
+      "path": "after/08-lighting-detail.webp",
+      "type": "after_photo",
+      "alt": "Lighting detail",
+      "width": 709,
+      "height": 728
+    },
+    {
+      "path": "after/09-timber-ceiling.webp",
+      "type": "after_photo",
+      "alt": "Timber ceiling",
+      "width": 709,
+      "height": 728
+    },
+    {
+      "path": "after/10-brickwork-entry.webp",
+      "type": "after_photo",
+      "alt": "Brickwork entry",
+      "width": 709,
+      "height": 728
+    }
+  ]
+}

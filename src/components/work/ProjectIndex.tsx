@@ -64,7 +64,10 @@ export default function ProjectIndex({ projects }: { projects: Project[] }) {
             </span>
             <span className="ix-c-num num t-note">{p.number}</span>
             <span className="ix-c-title t-l">{p.title}</span>
-            <span className="ix-c-cat t-small text-graphite">{p.category ?? dash}</span>
+            <span className="ix-c-cat t-small text-graphite">
+              {p.category ?? dash}
+              {p.status || p.mediaNote ? <span className="block text-orange-ink">{p.status ?? p.mediaNote}</span> : null}
+            </span>
             <span className="ix-c-loc t-small text-graphite">{p.location ?? dash}</span>
             <span className="ix-c-year t-note text-graphite">{p.year ?? dash}</span>
           </Link>

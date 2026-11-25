@@ -1,0 +1,4 @@
+# OSDO — Project 04: Residential Transformation
+Working title only; confirm official project name and completion status with OSDO.
+Use the after lounge (07) as cover. Keep existing and proposed floor plans side by side, then present the three before photographs and five after photographs in sequence. Use separate labelled galleries rather than a registered comparison slider because camera angles differ. Keep text minimal. Do not invent dates, dimensions or client details.
+All ten images are cropped from Instagram screenshots and converted to WebP. No architectural features were generated or retouched. Cropping removes carousel counters, mute icons and peripheral framing (including the plan branding outside the central drawings). Source resolution is limited to 709 pixels wide; avoid excessive enlargement. Request original files for full-screen use.

@@ -18,10 +18,11 @@ export default function LazyVideo({ media, controls = true }: { media: VideoMedi
     const v = ref.current;
     if (!v) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) userPaused.current = true;
+    if (reduce || media.autoplay === false) userPaused.current = true;
     const io = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
+          if (media.autoplay === false && userPaused.current) return; // on request only
           setSrc(media.src);
           if (!userPaused.current) v.play().catch(() => {});
         } else if (!v.paused) {
@@ -32,7 +33,7 @@ export default function LazyVideo({ media, controls = true }: { media: VideoMedi
     );
     io.observe(v);
     return () => io.disconnect();
-  }, [media.src]);
+  }, [media.src, media.autoplay]);
 
   useEffect(() => {
     const v = ref.current;
@@ -68,11 +69,11 @@ export default function LazyVideo({ media, controls = true }: { media: VideoMedi
         style={{ objectFit: "cover", objectPosition: media.focus ?? "50% 50%" }}
       />
       {controls ? (
-        <button type="button" className="film-btn" onClick={toggle} aria-label={playing ? "Pause film" : "Play film"}>
+        <button type="button" className={`film-btn ${!playing && media.autoplay === false ? "film-btn--big" : ""}`} onClick={toggle} aria-label={playing ? "Pause film" : "Play film"}>
           <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true">
             {playing ? <path d="M1 0h3v12H1zM6 0h3v12H6z" fill="currentColor" /> : <path d="M0 0l10 6-10 6z" fill="currentColor" />}
           </svg>
-          {playing ? "Pause" : "Play"}
+          {playing ? "Pause" : media.autoplay === false ? "Play reel" : "Play"}
         </button>
       ) : null}
     </>

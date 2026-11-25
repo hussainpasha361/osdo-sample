@@ -16,6 +16,7 @@ export default function Media({
   fill = false,
   className = "",
   showLabel = true,
+  fit,
 }: {
   media: M;
   sizes?: string;
@@ -24,8 +25,14 @@ export default function Media({
   fill?: boolean;
   className?: string;
   showLabel?: boolean;
+  /** Drawings default to "contain" whenever they are framed to another ratio, so plans are never cropped. */
+  fit?: "cover" | "contain";
 }) {
-  const style: React.CSSProperties = fill ? { position: "absolute", inset: 0, height: "100%" } : { aspectRatio: ratio ?? `${media.width} / ${media.height}` };
+  const objectFit = fit ?? (media.role === "plan" && (ratio || fill) ? "contain" : "cover");
+  const style: React.CSSProperties = {
+    ...(fill ? { position: "absolute", inset: 0, height: "100%" } : { aspectRatio: ratio ?? `${media.width} / ${media.height}` }),
+    ...(objectFit === "contain" && media.paper ? { background: media.paper } : null),
+  };
 
   return (
     <div className={`media ${className}`} style={style} data-status={media.status}>
@@ -36,7 +43,7 @@ export default function Media({
           fill
           sizes={sizes}
           priority={priority}
-          style={{ objectFit: "cover", objectPosition: media.focus ?? "50% 50%" }}
+          style={{ objectFit, objectPosition: media.focus ?? "50% 50%" }}
         />
       ) : media.kind === "video" ? (
         <LazyVideo media={media} />
