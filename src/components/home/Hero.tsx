@@ -37,16 +37,35 @@ export default function Hero() {
     const vh = window.innerHeight;
     const navH = vw < 900 ? 64 : 72;
     const margin = Math.min(Math.max(20, vw * 0.034), 56);
+    if (vw < 900) {
+      // Phone: a full-width frame between the name and the wordmark.
+      const full = vw - margin * 2;
+      const wordH = (full * 270) / 960;
+      const top = navH + 92;
+      const bottom = vh - wordH - 40 - 56;
+      let width = full;
+      let height = Math.min(width / (d.width / d.height), bottom - top);
+      width = Math.min(full, height * (d.width / d.height));
+      height = width / (d.width / d.height);
+      return { left: (vw - width) / 2, top, width, height: Math.min(height, bottom - top) };
+    }
     const height = vh - navH - 116;
     const width = Math.min((height * d.width) / d.height, vw * 0.38);
     return { left: vw - margin - width, top: navH + 60, width, height };
   }, [d.width, d.height]);
 
-  /** Final state: a row of four panes on the sheet; the lead frame becomes the last. */
+  /** Final state: four panes (a row on desktop, a 2×2 grid on phones); the lead frame becomes the last. */
   const paneRect = useCallback((i: number): Rect => {
     const vw = document.documentElement.clientWidth;
     const vh = window.innerHeight;
     const margin = Math.min(Math.max(20, vw * 0.034), 56);
+    if (vw < 900) {
+      const gap = 8;
+      const top = 64 + 12;
+      const w = (vw - margin * 2 - gap) / 2;
+      const h = (vh - top - 58 - gap) / 2;
+      return { left: margin + (i % 2) * (w + gap), top: top + Math.floor(i / 2) * (h + gap), width: w, height: h };
+    }
     const gap = Math.min(Math.max(10, vw * 0.012), 20);
     const top = (vw < 900 ? 64 : 72) + 22;
     const w = (vw - margin * 2 - gap * 3) / 4;
@@ -63,16 +82,11 @@ export default function Hero() {
 
   // Place the lead frame and compute guide positions (desktop).
   useEffect(() => {
-    if (!desktop) {
-      setGuideRect(null);
-      if (frame.current) frame.current.removeAttribute("style");
-      return;
-    }
     const place = () => {
       const r = startRect();
       const el = frame.current;
       if (el && (window.scrollY || 0) < 4) gsap.set(el, r);
-      setGuideRect({ vw: document.documentElement.clientWidth, vh: window.innerHeight, f: r });
+      setGuideRect(desktop ? { vw: document.documentElement.clientWidth, vh: window.innerHeight, f: r } : null);
     };
     place();
     window.addEventListener("resize", place);
@@ -110,7 +124,7 @@ export default function Hero() {
       }
 
       const mm = gsap.matchMedia();
-      mm.add("(min-width: 900px)", () => {
+      mm.add("(min-width: 0px)", () => {
         const f = frame.current!;
         const word = el.querySelector<HTMLElement>(".hero-word")!;
         const wsvg = word.querySelector("svg")!;
@@ -179,6 +193,7 @@ export default function Hero() {
           )
           .fromTo(paneEls.map((p) => p.querySelectorAll(".hero-note")), { opacity: 0 }, { opacity: 1, duration: 0.05, stagger: { amount: 0.05 } }, 0.44)
           .fromTo(el.querySelector(".hero-panes-cap"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.46)
+          .to(el.querySelector(".hero-toggle-wrap"), { bottom: 9, duration: 0.12, ease: "power2.inOut" }, 0.3)
           .to({}, { duration: 0.05 }, 0.95);
 
         (window as unknown as { __heroTl?: gsap.core.Timeline }).__heroTl = tl;
@@ -202,15 +217,6 @@ export default function Hero() {
           window.removeEventListener("resize", placePanes);
           lead.current?.setScroll(0);
         };
-      });
-      mm.add("(max-width: 899px)", () => {
-        ScrollTrigger.create({
-          trigger: frame.current,
-          start: "top 5%",
-          end: "bottom 40%",
-          scrub: true,
-          onUpdate: (s) => lead.current?.setScroll(s.progress),
-        });
       });
       return () => mm.revert();
     },

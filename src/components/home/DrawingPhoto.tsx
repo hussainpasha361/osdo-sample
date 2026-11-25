@@ -245,7 +245,7 @@ const DrawingPhoto = forwardRef<
             <g key={n.label} className="hero-note" data-nx={n.x} transform={`translate(${n.x} ${n.y})`}>
               <circle r={7} fill="var(--color-orange)" stroke="none" />
               <line x1={left ? -9 : 9} y1={0} x2={left ? -34 : 34} y2={0} stroke="var(--color-orange)" strokeWidth={1.5} />
-              <text x={left ? -40 : 40} y={7} textAnchor={left ? "end" : "start"} fill="var(--color-orange-ink)" stroke="none" style={{ font: "22px var(--font-mono)" }}>
+              <text x={left ? -40 : 40} y={7} textAnchor={left ? "end" : "start"} fill="var(--color-orange-ink)" stroke="none" className="hero-note-txt">
                 {n.label}
               </text>
             </g>

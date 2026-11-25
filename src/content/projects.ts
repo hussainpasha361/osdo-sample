@@ -49,16 +49,16 @@ const bellaReel: VideoMedia = {
 /* ------------------------------------------------- Residential Transformation */
 const R = "residential-transformation";
 const res = {
-  planExisting: img(R, "01-existing-plan.webp", 709, 672, "Existing plan of the veranda.", { role: "plan", label: "Existing plan", paper: PLAN_PAPER.residential }),
-  planProposed: img(R, "02-proposed-plan.webp", 709, 744, "Proposed plan of the veranda with new seating layout.", { role: "plan", label: "Proposed plan", paper: PLAN_PAPER.residential }),
-  b1: img(R, "03-existing-entrance.webp", 709, 728, "Existing entrance before renovation.", { role: "before", label: "Existing entrance" }),
-  b2: img(R, "04-existing-seating.webp", 709, 728, "Existing seating area before renovation.", { role: "before", label: "Existing seating" }),
-  b3: img(R, "05-existing-veranda.webp", 709, 728, "Existing veranda before renovation.", { role: "before", label: "Existing veranda" }),
-  a1: img(R, "06-renovated-entrance.webp", 709, 728, "Renovated entrance with timber screens, brick and wrought-iron gate.", { role: "after", label: "Renovated entrance" }),
-  a2: img(R, "07-renovated-lounge.webp", 709, 728, "Renovated lounge with stone wall, timber battens and layered lighting.", { role: "after", label: "Renovated lounge" }),
-  a3: img(R, "08-lighting-detail.webp", 709, 728, "Lantern wall light beside a timber-framed window.", { role: "after", label: "Lighting detail" }),
-  a4: img(R, "09-timber-ceiling.webp", 709, 728, "Timber-lined ceiling with track lighting and a ceiling fan.", { role: "after", label: "Timber ceiling" }),
-  a5: img(R, "10-brickwork-entry.webp", 709, 728, "Exposed brickwork beside a timber and glass door.", { role: "after", label: "Brickwork entry" }),
+  planExisting: img(R, "01-existing-plan.webp", 1418, 1344, "Existing plan of the veranda.", { role: "plan", label: "Existing plan", paper: PLAN_PAPER.residential }),
+  planProposed: img(R, "02-proposed-plan.webp", 1418, 1488, "Proposed plan of the veranda with new seating layout.", { role: "plan", label: "Proposed plan", paper: PLAN_PAPER.residential }),
+  b1: img(R, "03-existing-entrance.webp", 1418, 1456, "Existing entrance before renovation.", { role: "before", label: "Existing entrance" }),
+  b2: img(R, "04-existing-seating.webp", 1418, 1456, "Existing seating area before renovation.", { role: "before", label: "Existing seating" }),
+  b3: img(R, "05-existing-veranda.webp", 1418, 1456, "Existing veranda before renovation.", { role: "before", label: "Existing veranda" }),
+  a1: img(R, "06-renovated-entrance.webp", 1418, 1456, "Renovated entrance with timber screens, brick and wrought-iron gate.", { role: "after", label: "Renovated entrance" }),
+  a2: img(R, "07-renovated-lounge.webp", 1418, 1456, "Renovated lounge with stone wall, timber battens and layered lighting.", { role: "after", label: "Renovated lounge" }),
+  a3: img(R, "08-lighting-detail.webp", 1418, 1456, "Lantern wall light beside a timber-framed window.", { role: "after", label: "Lighting detail" }),
+  a4: img(R, "09-timber-ceiling.webp", 1418, 1456, "Timber-lined ceiling with track lighting and a ceiling fan.", { role: "after", label: "Timber ceiling" }),
+  a5: img(R, "10-brickwork-entry.webp", 1418, 1456, "Exposed brickwork beside a timber and glass door.", { role: "after", label: "Brickwork entry" }),
 };
 
 /* ------------------------------------------- Academy of Salon Science by Peng */

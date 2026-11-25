@@ -67,7 +67,7 @@ export default function HeroTools({ className = "" }: { className?: string }) {
         arc.setAttribute("d", arcPath(START, Math.max(START + 0.5, a)));
       };
 
-      if (!motionOK() || window.matchMedia("(max-width: 899px)").matches) {
+      if (!motionOK()) {
         setCompass(-20);
         gsap.set(square, { x: RULED[3] - 60 });
         ruled.forEach((l) => gsap.set(l, { attr: { y1: BLADE_Y - 4 } }));

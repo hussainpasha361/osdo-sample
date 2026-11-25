@@ -1194,6 +1194,17 @@ html.has-cursor .cursor {
   stroke: var(--color-ivory);
   clip-path: circle(var(--lens-r, 0px) at var(--lens-x, 50%) var(--lens-y, 50%));
 }
+.hero-note-txt {
+  font: 22px var(--font-mono);
+}
+@media (max-width: 899px) {
+  .hero-note-txt {
+    font-size: 44px;
+  }
+  .hero-note circle {
+    r: 11px;
+  }
+}
 .dp.is-open .hero-note text {
   fill: var(--color-ivory);
   paint-order: stroke;
@@ -1316,56 +1327,39 @@ html.has-cursor .cursor {
   }
 }
 @media (max-width: 899px) {
+  /* Phones run the same sticky sequence as desktop, with phone geometry (see Hero.tsx). */
   .hero {
-    height: auto;
-  }
-  .hero-stick {
-    position: relative;
-    height: auto;
-    min-height: 100svh;
-    padding: calc(var(--nav-h) + 16px) var(--margin) 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-  .hero-ident,
-  .hero-word,
-  .hero-cue {
-    position: relative;
-    left: auto;
-    top: auto;
-    bottom: auto;
-    right: auto;
-  }
-  .hero-frame {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    outline-offset: 6px;
+    height: 300vh;
   }
   .hero-ident {
+    top: calc(var(--nav-h) + 18px);
     max-width: none;
   }
   .hero-word {
-    width: 100%;
+    width: calc(100vw - var(--margin) * 2);
+    bottom: 22px;
+  }
+  .hero-frame {
+    outline-offset: 6px;
+  }
+  .hero-toggle-wrap {
+    right: var(--margin);
+    bottom: calc((100vw - var(--margin) * 2) * 0.281 + 36px);
   }
   .hero-tools {
     width: 100%;
-    opacity: 0.6;
+    opacity: 0.3;
   }
   .hero-cue,
-  .hero-pane,
-  .hero-panes-cap,
   .hero-guides-wrap {
     display: none;
   }
-  .hero-toggle-wrap {
-    position: relative;
-    right: auto;
-    bottom: auto;
+  .hero-panes-cap {
+    bottom: 20px;
+    max-width: 48%;
   }
   .hero-sheet {
-    display: none;
+    inset: 8px;
   }
 }
 
@@ -1606,9 +1600,16 @@ html.has-cursor .cursor {
   z-index: 1;
 }
 @media (max-width: 767px) {
-  .ex-flute--left,
+  .ex-flute--left {
+    left: auto;
+    right: -15px;
+    top: 8%;
+    width: 11px;
+    height: 70%;
+  }
   .ex-flute--side {
-    display: none;
+    left: -16px;
+    width: 11px;
   }
   .ex-grid--br,
   .ex-grid--tl,
@@ -1867,7 +1868,25 @@ html.has-cursor .cursor {
 }
 @media (max-width: 899px) {
   .inside-ring {
-    display: none;
+    right: -34px;
+    bottom: auto;
+    top: 28px;
+    width: 116px;
+  }
+}
+.films-glow {
+  position: absolute;
+  inset: -15%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(48px) saturate(1.3);
+  opacity: 0.4;
+  pointer-events: none;
+  display: none;
+}
+@media (max-width: 899px) {
+  .films-glow {
+    display: block;
   }
 }
 .inside-film {

@@ -91,6 +91,7 @@ export default function Films() {
   return (
     <section ref={root} className="films" aria-labelledby="films-title" data-nav-tone="ivory" data-section="On film">
       <video ref={ambient} className="films-ambient" muted loop playsInline preload="none" aria-hidden="true" tabIndex={-1} />
+      {current.poster ? <div className="films-glow" style={{ backgroundImage: `url(${current.poster})` }} aria-hidden="true" /> : null}
       <div className="films-door films-door--l" aria-hidden="true" />
       <div className="films-door films-door--r" aria-hidden="true" />
       <span className="films-seam" aria-hidden="true" />

@@ -39,10 +39,8 @@ function Marks({ num }: { num: string }) {
   );
 }
 
-const tagOf = (m: M) => (m.role === "before" ? "Before" : m.role === "after" ? "After" : undefined);
 
 function Frame({ m, ratio, sizes, num, drift = 3, arch = false, grid }: { m: M; ratio?: string; sizes: string; num?: string; drift?: number; arch?: boolean; grid?: "br" | "tl" | "tr" }) {
-  const tag = tagOf(m);
   return (
     <div className={`ex-frame ${arch ? "ex-frame--arch" : ""} ${grid ? "ex-frame--grid" : ""}`}>
       {grid ? <GridBox className={`ex-grid--${grid}`} /> : null}
@@ -51,7 +49,6 @@ function Frame({ m, ratio, sizes, num, drift = 3, arch = false, grid }: { m: M; 
         <Media media={m} ratio={ratio} sizes={sizes} />
       </ClipReveal>
       {num ? <Marks num={num} /> : null}
-      {tag ? <span className="fig-note t-note block">{tag}</span> : null}
     </div>
   );
 }
@@ -87,10 +84,10 @@ function Caption({ p }: { p: Project }) {
   );
 }
 
-/** Second image for a composition: a "before" if the project has one, otherwise the next photograph. */
+/** Second image for a composition: the strongest other photograph (for before-and-after projects, an "after"). */
 function companion(p: Project): M {
-  const before = p.transformation?.before.at(-1);
-  if (before) return before;
+  const after = p.transformation?.after.find((m) => m !== p.cover);
+  if (after) return after;
   return p.media.find((m) => m !== p.cover && m.role !== "plan" && m.kind === "image") ?? p.cover;
 }
 
