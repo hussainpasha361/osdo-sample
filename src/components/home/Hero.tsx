@@ -96,7 +96,10 @@ export default function Hero() {
       const ok = motionOK();
       const leadEl = el.querySelector(".hero-frame")!;
       if (ok) {
-        const tl = gsap.timeline({ delay: 0.15 });
+        // Wait for the loading screen on a first visit.
+        const waiting = document.documentElement.classList.contains("is-loading");
+        const tl = gsap.timeline({ delay: 0.15, paused: waiting });
+        if (waiting) window.addEventListener("osdo:loaded", () => tl.play(), { once: true });
         tl.fromTo(el.querySelectorAll("[data-hero-fade]"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: "power2.out" }, 0.2)
           .fromTo(leadEl.querySelectorAll('.hero-ink--paper [data-layer="lines"] [data-stroke]'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.5, ease: "power2.inOut", stagger: { amount: 0.7 } }, 0.25)
           .fromTo(leadEl.querySelectorAll('.hero-ink--paper [data-layer="soft"] [data-stroke]'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: "power2.out", stagger: { amount: 0.9 } }, 0.9)

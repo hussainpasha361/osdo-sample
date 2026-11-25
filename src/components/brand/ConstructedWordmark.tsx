@@ -78,6 +78,9 @@ const CENTRES: [number, number][] = [
   [D.x + 40, MID],
   [O2.cx, MID],
 ];
+/** Shared geometry, used by the loading screen to build the same letters. */
+export const GEOM = { W, H, TOP, BASE, MID, R, SW, strokes, guides, nodes, LETTER_OF_STROKE, CENTRES };
+
 const ORANGE = [195, 109, 56];
 const BASES = { light: [234, 230, 219], dark: [89, 99, 68] };
 const tint = (base: number[], k: number) => `rgb(${base.map((v, i) => Math.round(v + (ORANGE[i] - v) * k)).join(",")})`;
@@ -111,8 +114,9 @@ export default function ConstructedWordmark({
         drawn.current = true;
         return;
       }
+      const waiting = drawOn === "load" && document.documentElement.classList.contains("is-loading");
       const tl = gsap.timeline({
-        ...(drawOn === "scroll" ? { scrollTrigger: { trigger: svg, start: "top 85%", once: true } } : { delay }),
+        ...(drawOn === "scroll" ? { scrollTrigger: { trigger: svg, start: "top 85%", once: true } } : { delay, paused: waiting }),
         onComplete: () => {
           svg.classList.remove("draw--pending");
           drawn.current = true;
@@ -121,6 +125,7 @@ export default function ConstructedWordmark({
       tl.fromTo(svg.querySelectorAll(".fw-guide"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, stagger: 0.04, ease: "power2.inOut" })
         .fromTo(svg.querySelectorAll(".fw-node"), { scale: 0, transformOrigin: "center" }, { scale: 1, duration: 0.5, stagger: 0.05, ease: "back.out(2)" }, 0.5)
         .fromTo(svg.querySelectorAll(".fw-stroke"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.4, stagger: 0.12, ease: "expo.inOut" }, 0.6);
+      if (waiting) window.addEventListener("osdo:loaded", () => tl.play(), { once: true });
     },
     { scope: ref }
   );

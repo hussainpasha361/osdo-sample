@@ -769,6 +769,94 @@ html.motion.menu-open .menu-item:nth-child(5) {
 }
 
 /* =====================================================================
+   Loading screen (first visit only; see Loader.tsx and the boot script)
+   ===================================================================== */
+.loader {
+  display: none;
+}
+html.motion.is-loading {
+  overflow: hidden;
+}
+html.motion.is-loading .loader {
+  display: grid;
+  place-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: var(--color-olive);
+  color: var(--color-ivory);
+  clip-path: inset(0 0 0 0);
+  cursor: pointer;
+}
+.ld-inner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(20px, 4vh, 40px);
+  width: min(72vw, 860px);
+}
+.ld-svg {
+  width: 100%;
+  overflow: visible;
+}
+.ld-guide {
+  fill: none;
+  stroke: rgb(234 230 219 / 0.28);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.ld-node,
+.ld-lock {
+  fill: var(--color-orange);
+}
+.ld-lock {
+  opacity: 0;
+}
+.ld-stroke {
+  fill: none;
+  stroke: var(--color-ivory);
+}
+.ld-letter {
+  opacity: 0;
+}
+.ld-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(17px, 1.6vw, 24px);
+  letter-spacing: -0.015em;
+  opacity: 0;
+}
+.ld-count,
+.ld-meta,
+.ld-skip {
+  position: absolute;
+  bottom: clamp(18px, 4vh, 36px);
+  color: rgb(234 230 219 / 0.7);
+}
+.ld-count {
+  left: var(--margin);
+  color: var(--color-orange);
+  font-variant-numeric: tabular-nums;
+}
+.ld-meta {
+  right: var(--margin);
+  opacity: 0;
+}
+.ld-skip {
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.45;
+}
+@media (max-width: 767px) {
+  .ld-inner {
+    width: 86vw;
+  }
+  .ld-meta {
+    display: none;
+  }
+}
+
+/* =====================================================================
    Page transition
    ===================================================================== */
 .pt {
@@ -2698,5 +2786,79 @@ html.motion .cta-slat {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* =====================================================================
+   Mobile refinements
+   ===================================================================== */
+.ex-cap > span {
+  min-width: 0;
+}
+.ex-title {
+  overflow-wrap: anywhere;
+}
+@media (hover: none) {
+  .grid-toggle-btn {
+    display: none;
+  }
+}
+@media (max-width: 899px) {
+  .menu-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .menu-item a {
+    padding-block: 4px;
+  }
+  .menu-foot a,
+  .menu-foot span {
+    padding-block: 8px;
+  }
+  .nav-cell {
+    padding-inline: 12px;
+  }
+  .nav-menu-btn {
+    padding-inline: 14px;
+    gap: 10px;
+  }
+  .nav-here {
+    font-size: 11px;
+  }
+  /* comfortable touch targets */
+  .footer nav a,
+  .footer .grid-12 a,
+  .footer-base a,
+  .pj-next a,
+  .contact-dd-link {
+    display: inline-block;
+    padding-block: 10px;
+  }
+  .footer nav ul {
+    gap: 0;
+  }
+  .hero-toggle button {
+    padding: 12px 16px;
+  }
+  .mode-btn {
+    padding-block: 12px;
+  }
+  .films-sound {
+    padding: 13px 16px;
+  }
+  .films-ambient {
+    display: none;
+  }
+  .hero-tools {
+    opacity: 0.35;
+  }
+  .t-xxl {
+    font-size: clamp(46px, 13.5vw, 72px);
+  }
+}
+@media (max-width: 380px) {
+  .nav-word {
+    display: none;
   }
 }

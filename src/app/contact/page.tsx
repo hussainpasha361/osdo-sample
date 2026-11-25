@@ -16,7 +16,7 @@ export default function ContactPage() {
     {
       k: "Instagram",
       v: (
-        <a className="u-line" href={site.instagram.url} target="_blank" rel="noreferrer">
+        <a className="u-line contact-dd-link" href={site.instagram.url} target="_blank" rel="noreferrer">
           @{site.instagram.handle}
         </a>
       ),

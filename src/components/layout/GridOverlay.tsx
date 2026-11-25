@@ -30,7 +30,7 @@ export default function GridOverlay() {
 
 export function GridToggle({ className = "" }: { className?: string }) {
   return (
-    <button type="button" className={className} onClick={() => window.dispatchEvent(new Event("osdo:grid"))}>
+    <button type="button" className={`grid-toggle-btn ${className}`} onClick={() => window.dispatchEvent(new Event("osdo:grid"))}>
       Show the grid <span className="opacity-60">(G)</span>
     </button>
   );

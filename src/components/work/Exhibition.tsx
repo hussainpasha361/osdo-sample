@@ -178,11 +178,11 @@ export default function Exhibition({ projects, flagshipSlug }: { projects: Proje
           );
         return (
           <li key={p.slug} className="ex-item grid-12 gap-y-6">
-            <div className="col-span-3 mt-[30%] md:col-span-3 md:col-start-1 md:mt-[22%] relative" aria-hidden="true">
+            <div className="col-span-4 col-start-3 order-2 mt-2 md:order-none md:col-span-3 md:col-start-1 md:mt-[22%] relative" aria-hidden="true">
               <Fluted className="ex-flute--side" />
               <Frame m={second} ratio="4 / 5" sizes="(min-width: 768px) 25vw, 50vw" drift={5} arch />
             </div>
-            <Link href={href} className="ex-link col-span-3 md:col-start-5 md:col-span-5 relative" data-cursor="View project" aria-label={label}>
+            <Link href={href} className="ex-link col-span-6 md:col-start-5 md:col-span-5 relative" data-cursor="View project" aria-label={label}>
               <Frame m={p.cover} ratio="4 / 5" sizes="(min-width: 768px) 40vw, 50vw" num={p.number} grid="br" />
               <Caption p={p} />
             </Link>
